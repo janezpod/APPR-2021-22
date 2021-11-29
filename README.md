@@ -1,11 +1,16 @@
-# Analiza podatkov s programom R - 2021/22
+# Sistem za izposojo koles Capital Bikeshare
 
-Vzorčni repozitorij za projekt pri predmetu APPR v študijskem letu 2021/22. 
+Repozitorij z gradivi pri predmetu APPR v študijskem letu 2021/22.
 
 ## Tematika
 
-Izbrali si boste temo, s katero se bo vaš projekt ukvarjal.
-Tukaj boste napisali, kje ste dobili podatke, ter kakšen je vaš cilj.
+Capital Bikeshare je največji sistem za izposojo koles, ki se nahaja v Washington, D.C. in okolici. Po velikosti je tretji največji v Združenih državah Amerike. Obravnavani bodo podatki od novembra 2018 do novembra 2021. Analiza se bo osredotočila na vpliv vremena in dela prostih dni na izposojo koles in relacijo voženj. Neizbežno bom analiziral tudi vpliv koronavirusa na uporaba koles, saj se je pandemija začela marca 2020 in v trenutku pisanja še poteka.
+
+### Viri
+- [Capital Bike Share](https://www.capitalbikeshare.com/system-data)
+- [Meteostat](https://meteostat.net/en/place/365KYE)
+- [Government of the District of Columbia](https://edpm.dc.gov/issuances/legal-public-holidays-2021/)
+- [New York Times](https://github.com/nytimes/covid-19-data)
 
 ## Program
 
