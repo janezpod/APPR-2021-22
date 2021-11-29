@@ -4,7 +4,7 @@ Repozitorij z gradivi pri predmetu APPR v študijskem letu 2021/22.
 
 ## Tematika
 
-Capital Bikeshare je največji sistem za izposojo koles, ki se nahaja v Washington, D.C. in okolici. Po velikosti je tretji največji v Združenih državah Amerike. Obravnavani bodo podatki od novembra 2018 do novembra 2021. Analiza se bo osredotočila na vpliv vremena in dela prostih dni na izposojo koles in relacijo voženj. Neizbežno bom analiziral tudi vpliv koronavirusa na uporaba koles, saj se je pandemija začela marca 2020 in v trenutku pisanja še poteka.
+Capital Bikeshare je sistem za izposojo koles, ki se nahaja v Washington, D.C. in okolici. Po velikosti je tretji največji v Združenih državah Amerike. Obravnavani bodo podatki od novembra 2018 do novembra 2021. Analiza se bo osredotočila na vpliv vremena in dela prostih dni na izposojo koles in relacijo voženj. Neizbežno bom analiziral tudi vpliv koronavirusa na uporaba koles, saj se je pandemija začela marca 2020 in v trenutku pisanja še poteka.
 
 ### Viri
 - [Capital Bike Share](https://www.capitalbikeshare.com/system-data)
