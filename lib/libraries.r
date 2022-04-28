@@ -7,6 +7,8 @@ library(shiny)
 library(readr)
 library(dplyr)
 library(tibble)
+library(magrittr)
+library(aws.s3)
 
 options(gsubfn.engine="R")
 
