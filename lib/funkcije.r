@@ -1,6 +1,11 @@
 library(aws.s3)
-# Sprejeme leto v formatu YYYY in je vkljucno od in do vnesenega leta
-PrenosCB <- function(OdLeto = 2010, DoLeto) {
+library(magrittr)
+library(tibble)
+library(tidyverse)
+library(lubridate)
+
+# Sprejeme leto v formatu YYYY in je vkljucno od in do izbranega leta
+PrenosCB <- function(OdLeto = 2010, DoLeto = Odlet) {
   bucket <- get_bucket('capitalbikeshare-data')
   bucket <- bucket[-length(bucket)]
   seznam <- vector('character', length(bucket))
@@ -21,7 +26,7 @@ PrenosCB <- function(OdLeto = 2010, DoLeto) {
   }
 }
 
-# Prebere imena stolpcev v seznam v odvisnosti od vzorca
+# Prebere le imena stolpcev v seznam csv datotek v odvisnosti od vzorca
 ImenaStolpcev <- function(pattern) {
   ImeDatotekCB <- list.files('./podatki', pattern = pattern, full.names = TRUE)
   ImeStolpcevCB <- vector(mode = 'list', length = length(ImeDatotekCB))
