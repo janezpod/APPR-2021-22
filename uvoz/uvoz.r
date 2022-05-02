@@ -214,7 +214,7 @@ postaje <- tbl2 %>%
   ) %>%
   arrange(station_id) 
 
-# Opazimo tudi nekaj sumljivih postaj, ki striljo ven:
+#  Opazimo tudi nekaj sumljivih postaj, ki striljo ven:
 #
 # 32900 (Motivate BX Tech office) 38.96441, -77.01076
 # 32901 (6035 Warehouse) 38.96381, -77.01027
@@ -369,4 +369,63 @@ rm(
 )
 
 gc()
+
+#  Vremenski podatki vsebujejo kar nekaj nevsecnosti. Podatki FMTM in PGTM so
+# zabelezeni le do 1.4.2013, a jih lahko spustimo, saj so nepomembni vetrovni
+# podatki. WESD vsebuje le NA in jih odstranimo. Podatki TAVG (Average 
+# Temperature) se zacnejo beleziti sele 1.4.2013, kar bo pomembno vplivalno na 
+# analizo. Podatki WT** (Weather types) so zabelezeni z 1, ce so resnicni in NA,
+# ce niso, zato jih prebermo kot logical in NA spremenimo v FALSE.
+
+noaa <- read_csv(
+  './podatki/NOAA.csv',
+  show_col_types = FALSE,
+  col_types = cols(
+    .default = col_guess(),
+    WT01 = col_logical(),
+    WT02 = col_logical(),
+    WT03 = col_logical(),
+    WT04 = col_logical(),
+    WT05 = col_logical(),
+    WT06 = col_logical(),
+    WT08 = col_logical(),
+    WT09 = col_logical(),
+    WT11 = col_logical(),
+    WT13 = col_logical(),
+    WT14 = col_logical(),
+    WT15 = col_logical(),
+    WT16 = col_logical(),
+    WT17 = col_logical(),
+    WT18 = col_logical(),
+    WT21 = col_logical(),
+    WT22 = col_logical()
+  )
+) %>%
+  select(
+    -STATION,
+    -FMTM,
+    -PGTM,
+    -WESD
+  ) %>%
+  replace_na(
+    list(
+      WT01 = FALSE,
+      WT02 = FALSE,
+      WT03 = FALSE,
+      WT04 = FALSE,
+      WT05 = FALSE,
+      WT06 = FALSE,
+      WT08 = FALSE,
+      WT09 = FALSE,
+      WT11 = FALSE,
+      WT13 = FALSE,
+      WT14 = FALSE,
+      WT15 = FALSE,
+      WT16 = FALSE,
+      WT17 = FALSE,
+      WT18 = FALSE,
+      WT21 = FALSE,
+      WT22 = FALSE
+    )
+  )
 
