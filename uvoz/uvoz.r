@@ -107,7 +107,7 @@ tbl1 <-
     -'Bike number'
   ) %>%
   mutate(
-    ridable_type = 'docked_bike'
+    rideable_type = 'docked_bike'
   )
 
 #  Zelimo ustvariti loceno tabelo, ki vsebuje vse potrebne podatke o postajah.
@@ -115,9 +115,10 @@ tbl1 <-
 
 postaje_tbl1 <- tbl1$start_station_id %>%
   unique()
-  
+
 postaje_tbl2 <- tbl2$start_station_id %>%
   unique()
+
 
 manjkajoce_postaje_id <- setdiff(postaje_tbl1,postaje_tbl2)
 
@@ -153,18 +154,13 @@ tbl1 <- tbl1 %>%
       start_station_name,
       start_station_name == '22nd & H  NW (disabled)',
       '22nd & H St NW'
+      ),
+      end_station_name = replace(
+        end_station_name,
+        end_station_name == '22nd & H  NW (disabled)',
+        '22nd & H St NW'
       )
-    ) %>%
-  mutate(
-    end_station_name = replace(
-      end_station_name,
-      end_station_name == '22nd & H  NW (disabled)',
-      '22nd & H St NW'
     )
-  )
-
-m_lat = c(38.89959, 38.86292, 38.88362, 39.09420, 38.92360,)
-m_lng = c(-77.04884, -77.05183, -76.95754, -77.13259, -77.23131)
 
 manjkajoce_postaje <- tbl1 %>%
   select(
@@ -173,11 +169,11 @@ manjkajoce_postaje <- tbl1 %>%
   ) %>%
   filter(
     start_station_id == manjkajoce_postaje_id[1] |
-      start_station_id == manjkajoce_postaje_id[2] |
-      start_station_id == manjkajoce_postaje_id[3] |
-      start_station_id == manjkajoce_postaje_id[4] |
-      start_station_id == manjkajoce_postaje_id[5] |
-      start_station_id == manjkajoce_postaje_id[6]
+    start_station_id == manjkajoce_postaje_id[2] |
+    start_station_id == manjkajoce_postaje_id[3] |
+    start_station_id == manjkajoce_postaje_id[4] |
+    start_station_id == manjkajoce_postaje_id[5] |
+    start_station_id == manjkajoce_postaje_id[6]
   ) %>%
   unique() %>%
   arrange(start_station_id) %>%
@@ -218,7 +214,7 @@ postaje <- tbl2 %>%
   ) %>%
   arrange(station_id) 
 
-# Opazimo tudi nekaj zanimivih postaj:
+# Opazimo tudi nekaj sumljivih postaj, ki striljo ven:
 #
 # 32900 (Motivate BX Tech office) 38.96441, -77.01076
 # 32901 (6035 Warehouse) 38.96381, -77.01027
@@ -226,10 +222,151 @@ postaje <- tbl2 %>%
 # NA (MTL-ECO5-03) NA, NA
 # NA (NA) 38.91626 ,-77.02439
 #
-#  Zadnjo postajo, ki nima ne id stevilke ne imena najlazje razlozimo.
+#  Zadnjo postajo, ki nima ne id stevilke ne imena, lahko takoj razlozimo.
 # 17.6.2020 se prvic v bazi pojavi eletkricno kolo, ki si ga ni potrebno
 # izposoditi oz. vrniti na doloceni postaji, temveč kjerkoli znoraj nekega
-# omejenjga obomcja mesta. Predstavlja torej povprecno lokacijo izposoje
+# omejenjga obomcja mesta. NA NA predstavlja povprecno lokacijo izposoje
 # elektricnega kolesa.
 
+sumljive_postaje <- bind_rows(
+  tbl2 %>%
+    filter(
+      start_station_id == 32900 |
+      end_station_id == 32900
+    ) %>%
+    mutate(
+      count = n()
+    ) %>%
+    transmute(
+      station_id = 32900,
+      station_name = 'Motivate BX Tech office',
+      count = count,
+      max_duration = max(duration),
+      min_duration = min(duration),
+      avg_duration = mean(duration)
+    ) %>%
+    unique(),
+  tbl2 %>%
+    filter(
+      start_station_id == 32901 |
+      end_station_id == 32901
+    ) %>%
+    mutate(
+      count = n()
+    ) %>%
+    transmute(
+      station_id = 32901,
+      station_name = '6035 Warehouse',
+      count = count,
+      max_duration = max(duration),
+      min_duration = min(duration),
+      avg_duration = mean(duration)
+    ) %>%
+    unique(),
+  tbl2 %>%
+    filter(
+      start_station_id == 32902 |
+      end_station_id == 32902
+    ) %>%
+    mutate(
+      count = n()
+    ) %>%
+    transmute(
+      station_id = 32902,
+      station_name = 'Motivate Tech Office',
+      count = count,
+      max_duration = max(duration),
+      min_duration = min(duration),
+      avg_duration = mean(duration)
+    ) %>%
+    unique(),
+  tbl2 %>%
+    filter(
+      start_station_name == 'MTL-ECO5-03' |
+      end_station_name == 'MTL-ECO5-03'
+    ) %>%
+    mutate(
+      count = n()
+    ) %>%
+    transmute(
+      station_id = NA,
+      station_name = 'MTL-ECO5-03',
+      count = count,
+      max_duration = max(duration),
+      min_duration = min(duration),
+      avg_duration = mean(duration)
+    ) %>%
+    unique()
+)
+
+#  Ko pogledamo tabelo sumljivih vidimi, da so vse zares sumljive, zato
+# iz tabele tbl2 izlocimo voznje v in iz teh postaj, izlocimo jih tudi iz 
+# tabele postaj tako, da vse postaje se enkrat izracunamo.
+
+tbl2 <- tbl2 %>%
+  filter(
+    start_station_name %in% sumljive_postaje$station_name == FALSE |
+    end_station_name %in% sumljive_postaje$station_name == FALSE
+  )
+
+postaje <- tbl2 %>%
+  select(
+    station_name = start_station_name,
+    station_id = start_station_id,
+    start_lat,
+    start_lng
+  ) %>%
+  group_by(
+    station_id,
+    station_name
+  ) %>%
+  summarise(
+    lat = mean(start_lat),
+    lng = mean(start_lng)
+  ) %>%
+  ungroup(
+    station_id,
+    station_name
+  ) %>%
+  add_row(
+    station_name = manjkajoce_postaje$start_station_name,
+    station_id = manjkajoce_postaje$start_station_id,
+    lat = manjkajoce_postaje$start_lat,
+    lng = manjkajoce_postaje$start_lng
+  ) %>%
+  arrange(station_id)
+
+#  Ko imamo tabelo postaj in njihovih koordinat lahko iz tabele tbl2 odstranimo
+# koordinate, tabelo preuredimo in spnemo s tabelo tbl1.
+
+tbl_CB <- bind_rows(
+  tbl1,
+  tbl2 <- tbl2 %>%
+    select(
+      duration,
+      started_at,
+      ended_at,
+      start_station_id,
+      start_station_name,
+      end_station_id,
+      end_station_name,
+      member_casual,
+      rideable_type
+    )
+)
+
+#  Pospravimo nepotrebne tabele in spremenljivke in sprostimo spomin.
+
+rm(
+  ImenaStolpcevCB,
+  postaje_tbl1,
+  postaje_tbl2,
+  manjkajoce_postaje_id,
+  manjkajoce_postaje,
+  sumljive_postaje,
+  tbl1,
+  tbl2
+)
+
+gc()
 
