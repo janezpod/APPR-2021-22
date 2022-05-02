@@ -227,6 +227,10 @@ postaje <- tbl2 %>%
 # izposoditi oz. vrniti na doloceni postaji, temveč kjerkoli znoraj nekega
 # omejenjga obomcja mesta. NA NA predstavlja povprecno lokacijo izposoje
 # elektricnega kolesa.
+#
+#  Ostale bomo podrobneje pogledali tako, da bomo presteli stevilo opravljenih
+# vozenj iz ali v postajo, maksimalni cas voznje, minimalni cas voznje in
+# povprecni cas voznje (v sekundah).
 
 sumljive_postaje <- bind_rows(
   tbl2 %>%
