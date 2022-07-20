@@ -1,19 +1,20 @@
-# 2. faza: Uvoz podatkov
+#2. faza: Uvoz podatkov
 
+source('lib/funkcije.r', encoding='UTF-8')
 sl <- locale("sl", decimal_mark=",", grouping_mark=".")
 
 #  Podatki o zgodovini vozenj s kolesi se zacenjo leta 2010. Do vkljucno leta
 # 2017 so bili podatki na AWS nalozeni letno oz. cetrtletno, poznejsi pa so
 # nalozeni mesecno.
-
-source('lib/funkcije.r', encoding='UTF-8')
+#  POZOR: Prenos traja kar nekaj casa, saj so podatki o kolesarskih vožnjah
+# skupaj veliki cca. 4 Gb
 
 PrenosCB(2011, 2021)
 
 ImenaStolpcevCB <- ImenaStolpcev('tripdata')
 
 #  Ko na hitro pregledamo imena stolpcev tabel, se nam zdi, da so stolpci v
-# tabelah enako poimenovane od tabele 1 (2011) do vkljucno tabele 53 (202003).
+# tabelah enako poimenovane od tabele 1 (2011) do vkljucno tabele 52 (202003).
 # Stolpci vsebujejo cas voznje, datum zacetka in konca voznje, ime in stevilka
 # zacetne in koncne postaje, stevilko kolesa ter tip narocnine.
 #
@@ -21,12 +22,13 @@ ImenaStolpcevCB <- ImenaStolpcev('tripdata')
 # podatke. Dodani se tudi stolpci za ID voznje, tip kolesa ter geografsko sirino in
 # dolzino zacetne in koncne postaje. Odstranjen je stolpec za cas voznje.
 #
-#  S spodnjo zanko lahko preverimo, da so stolpci res dosledni s tabelo 1 do
-# tabele 53 ter da so dosledni s tabelo 54 do zadnje tabele 73.
+#  S spodnjo zanko lahko preverimo, da so stolpci med seboj res dosledni v 
+# tabli 1 do tabele 52 ter da so stolpci med seboj dosledni v tabeli 53 
+# do zadnje tabele 73.
 
 for (i in 1:length(ImenaStolpcevCB)) {
-  if (i <= 53) {
-    if (all(ImenaStolpcevCB[[i]] == ImenaStolpcevCB[[53]])) {
+  if (i <= 52) {
+    if (all(ImenaStolpcevCB[[i]] == ImenaStolpcevCB[[52]])) {
       ImenaStolpcevCB[[i]] = TRUE
     }
   }
@@ -36,18 +38,19 @@ for (i in 1:length(ImenaStolpcevCB)) {
     }
   }
 }
-all(as.logical(ImenaStolpcevCB)) == TRUE
+rm(i)
+all(as.logical(unlist(ImenaStolpcevCB)))
 
-#  Najprej preberemo in uredimo tabele 54 do 73. Dodamo stolpec (duration),
-# ki nam pove dolzino voznje v sekundah in odstranimo stolpec unikatnih imen
-# vozenj (ride_id).
+#  Najprej preberemo in uredimo tabele od vkljucno 53 do 73. Dodamo stolpec 
+#(duration), ki nam pove dolzino voznje v sekundah in odstranimo stolpec
+# unikatnih imen vozenj (ride_id).
 
 tbl2 <- 
   list.files(
     path = './podatki',
     pattern = 'tripdata',
     full.names = TRUE
-  )[54:73] %>%
+  )[53:73] %>%
   map_df(
     ~read_csv(
       .,
@@ -62,7 +65,7 @@ tbl2 <-
     )
   ) %>%
   mutate(
-    duration = (ended_at - started_at) %>%
+    duration = difftime(ended_at, started_at) %>%
       as.duration() %>%
       as.numeric('seconds')
   ) %>%
@@ -70,7 +73,7 @@ tbl2 <-
     -ride_id
   )
 
-#  Uredimo tabele 1 do 53. Stolpce preimenujemo v skladu s tabelo tbl2,
+#  Uredimo tabele 1 do vkljucno 52. Stolpce preimenujemo v skladu s tabelo tbl2,
 # dodamo stolpec (rideable_type), ki opisuje tip kolesa. Vse vrednosti tega
 # stolpca nastavimo na docked_bike, saj ce pogledamo prvih nekaj mesecev tabele
 # tbl2 so vse vrednosti docked_bike, sele kasneje se pojavijo drugi vnosi.
@@ -80,7 +83,7 @@ tbl1 <-
     path = './podatki',
     pattern = 'tripdata',
     full.names = TRUE
-  )[1:53] %>%
+  )[1:52] %>%
   map_df(
     ~read_csv(
       .,
@@ -119,22 +122,16 @@ postaje_tbl1 <- tbl1$start_station_id %>%
 postaje_tbl2 <- tbl2$start_station_id %>%
   unique()
 
-
 manjkajoce_postaje_id <- setdiff(postaje_tbl1,postaje_tbl2)
 
 manjkajoce_postaje <- tbl1 %>%
   select(
     start_station_id,
     start_station_name
-    ) %>%
+  ) %>%
   filter(
-    start_station_id == manjkajoce_postaje_id[1] |
-    start_station_id == manjkajoce_postaje_id[2] |
-    start_station_id == manjkajoce_postaje_id[3] |
-    start_station_id == manjkajoce_postaje_id[4] |
-    start_station_id == manjkajoce_postaje_id[5] |
-    start_station_id == manjkajoce_postaje_id[6]
-    ) %>%
+    start_station_id %in% manjkajoce_postaje_id
+  ) %>%
   unique() %>%
   arrange(start_station_id)
 
@@ -142,7 +139,7 @@ manjkajoce_postaje <- tbl1 %>%
 # postaje kar nekaj vozenj, zato jih ne moremo kar ignorirati. Postaji 
 # 22nd & H St NW in 22nd & H St  NW (disabled) bomo zdruzili v eno, saj si 
 # delita station_id 0.
-# (Naj opozori, da je pri drugi postaji med St in NW dvojni presledk)
+# (Naj opozorim, da JE pri drugi postaji med St in NW dvojni presledk)
 
 #  Na sreco so postaje poimenovane po kriziscu cest in jih manjka le 5, njihove
 # koordinate poiscemo na Google Maps in jih rocno dodamo v tabelo manjkajocih
@@ -162,30 +159,15 @@ tbl1 <- tbl1 %>%
       )
     )
 
-manjkajoce_postaje <- tbl1 %>%
-  select(
-    start_station_id,
-    start_station_name
-  ) %>%
-  filter(
-    start_station_id == manjkajoce_postaje_id[1] |
-    start_station_id == manjkajoce_postaje_id[2] |
-    start_station_id == manjkajoce_postaje_id[3] |
-    start_station_id == manjkajoce_postaje_id[4] |
-    start_station_id == manjkajoce_postaje_id[5] |
-    start_station_id == manjkajoce_postaje_id[6]
-  ) %>%
-  unique() %>%
-  arrange(start_station_id) %>%
+manjkajoce_postaje <- manjkajoce_postaje %>%
   add_column(
     start_lat = c(38.89959, 38.86292, 38.88362, 39.09420, 38.92360),
     start_lng = c(-77.04884, -77.05183, -76.95754, -77.13259, -77.23131)
   )
-  
 
-#  Iz tabele tbl2 izlusicmo id, ime in koordinate za vsako postajo. Ker se
+#  Iz tabele tbl2 izluscimo id, ime in koordinate za vsako postajo. Ker se
 # koordinate za iste postaje razlikujejo za nekaj decimalk vzamemo njihovo
-# povprecje. Na koncu dodamo se manjkajoce postaje.
+# povprecje. Na koncu dodamo se manjkajoce postaje in dobimo tabelo vseh postaj.
 
 postaje <- tbl2 %>%
   select(
@@ -224,13 +206,15 @@ postaje <- tbl2 %>%
 #
 #  Zadnjo postajo, ki nima ne id stevilke ne imena, lahko takoj razlozimo.
 # 17.6.2020 se prvic v bazi pojavi eletkricno kolo, ki si ga ni potrebno
-# izposoditi oz. vrniti na doloceni postaji, temveč kjerkoli znoraj nekega
+# izposoditi oz. vrniti na doloceni postaji, temvec kjerkoli znoraj nekega
 # omejenjga obomcja mesta. NA NA predstavlja povprecno lokacijo izposoje
 # elektricnega kolesa.
 #
 #  Ostale bomo podrobneje pogledali tako, da bomo presteli stevilo opravljenih
 # vozenj iz ali v postajo, maksimalni cas voznje, minimalni cas voznje in
 # povprecni cas voznje (v sekundah).
+#  OPOMBA: Spodnja kodo za sumljive_postaje bi se verjetno dalo napisati bistveno
+# elegantnejse in  krajse, a tudi ta grda koda deluje.
 
 sumljive_postaje <- bind_rows(
   tbl2 %>%
@@ -309,8 +293,8 @@ sumljive_postaje <- bind_rows(
 
 tbl2 <- tbl2 %>%
   filter(
-    start_station_name %in% sumljive_postaje$station_name == FALSE |
-    end_station_name %in% sumljive_postaje$station_name == FALSE
+    start_station_name %ni% sumljive_postaje$station_name,
+    end_station_name %ni% sumljive_postaje$station_name
   )
 
 postaje <- tbl2 %>%
@@ -343,21 +327,46 @@ postaje <- tbl2 %>%
 #  Ko imamo tabelo postaj in njihovih koordinat lahko iz tabele tbl2 odstranimo
 # koordinate, tabelo preuredimo in spnemo s tabelo tbl1.
 
-tbl_CB <- bind_rows(
-  tbl1,
-  tbl2 <- tbl2 %>%
+tblCB <- bind_rows(
+  tbl1 <- tbl1 %>%
     select(
-      duration,
       started_at,
       ended_at,
       start_station_id,
-      start_station_name,
       end_station_id,
-      end_station_name,
+      member_casual,
+      rideable_type
+      ),
+  tbl2 <- tbl2 %>%
+    select(
+      started_at,
+      ended_at,
+      start_station_id,
+      end_station_id,
       member_casual,
       rideable_type
     )
 )
+
+#  Dolgo casa sem se spraseval kaksna je razlika med 'docked_bike' in
+# 'classic_bike', saj v stolpcu ridable_type, saj slednji nenadoma izgine iz
+# podatkov Aprila 2020 in je od takrat naprej naveden 'classic_bike', kasneje
+# pa se mu pridruzi se 'electric_bike'. Sumil sem, da so le preimenovali in da
+# razlik med njima ni. Potrdilo sem dobil v sledecem sporocilu:
+#
+# Hi Janez,
+#
+# In April 2020 we made some changes to the platform that Divvy runs on. Prior 
+# to that date, a classic bike (not electric) is described as a "docked_bike" 
+# in the monthly data, after April 2020 the same bikes are tracked as 
+# "classic_bike". The bikes are the same, there's no difference between them 
+# (other than the date-related change described above). Let us know if you have 
+# any further questions.
+#
+# Regards,
+# lyft
+
+tblCB$rideable_type[tblCB$rideable_type=='docked_bike'] <- 'classic_bike'
 
 #  Pospravimo nepotrebne tabele in spremenljivke in sprostimo spomin.
 
@@ -374,12 +383,15 @@ rm(
 
 gc()
 
+print(object.size(tblCB),units = 'Gb')
+
 #  Vremenski podatki vsebujejo kar nekaj nevsecnosti. Podatki FMTM in PGTM so
 # zabelezeni le do 1.4.2013, a jih lahko spustimo, saj so nepomembni vetrovni
 # podatki. WESD vsebuje le NA in jih odstranimo. Podatki TAVG (Average 
 # Temperature) se zacnejo beleziti sele 1.4.2013, kar bo pomembno vplivalno na 
 # analizo. Podatki WT** (Weather types) so zabelezeni z 1, ce so resnicni in NA,
 # ce niso, zato jih prebermo kot logical in NA spremenimo v FALSE.
+# (Zagotovo obstaja elegantnejsa zapis z vektrojem.)
 
 noaa <- read_csv(
   './podatki/NOAA.csv',
@@ -432,4 +444,3 @@ noaa <- read_csv(
       WT22 = FALSE
     )
   )
-

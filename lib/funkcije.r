@@ -1,8 +1,7 @@
-library(aws.s3)
-library(magrittr)
-library(tibble)
-library(tidyverse)
-library(lubridate)
+source('lib/libraries.r', encoding='UTF-8')
+
+# Negacija funkcije in
+`%ni%` <- Negate(`%in%`)
 
 # Sprejeme leto v formatu YYYY in je vkljucno od in do izbranega leta
 PrenosCB <- function(OdLeto = 2010, DoLeto = Odlet) {
