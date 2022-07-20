@@ -9,9 +9,21 @@ sl <- locale("sl", decimal_mark=",", grouping_mark=".")
 #  POZOR: Prenos traja kar nekaj casa, saj so podatki o kolesarskih vožnjah
 # skupaj veliki cca. 4 Gb
 
-PrenosCB(2011, 2021)
+if (
+  identical(
+    list.files(
+      path = './podatki',
+      pattern = 'tripdata',
+      full.names = TRUE
+    ),
+    readRDS('./podatki/FileNamesCB.rds')
+  ) == FALSE
+) {
+  PrenosCB(2011, 2021)
+}
 
-ImenaStolpcevCB <- ImenaStolpcev('tripdata')
+
+# ImenaStolpcevCB <- ImenaStolpcev('tripdata')
 
 #  Ko na hitro pregledamo imena stolpcev tabel, se nam zdi, da so stolpci v
 # tabelah enako poimenovane od tabele 1 (2011) do vkljucno tabele 52 (202003).
@@ -26,20 +38,20 @@ ImenaStolpcevCB <- ImenaStolpcev('tripdata')
 # tabli 1 do tabele 52 ter da so stolpci med seboj dosledni v tabeli 53 
 # do zadnje tabele 73.
 
-for (i in 1:length(ImenaStolpcevCB)) {
-  if (i <= 52) {
-    if (all(ImenaStolpcevCB[[i]] == ImenaStolpcevCB[[52]])) {
-      ImenaStolpcevCB[[i]] = TRUE
-    }
-  }
-  else {
-    if (all(ImenaStolpcevCB[[i]] == ImenaStolpcevCB[[length(ImenaStolpcevCB)]])) {
-      ImenaStolpcevCB[[i]] = TRUE
-    }
-  }
-}
-rm(i)
-all(as.logical(unlist(ImenaStolpcevCB)))
+# for (i in 1:length(ImenaStolpcevCB)) {
+#   if (i <= 52) {
+#     if (all(ImenaStolpcevCB[[i]] == ImenaStolpcevCB[[52]])) {
+#       ImenaStolpcevCB[[i]] = TRUE
+#     }
+#   }
+#   else {
+#     if (all(ImenaStolpcevCB[[i]] == ImenaStolpcevCB[[length(ImenaStolpcevCB)]])) {
+#       ImenaStolpcevCB[[i]] = TRUE
+#     }
+#   }
+# }
+# rm(i)
+# all(as.logical(unlist(ImenaStolpcevCB)))
 
 #  Najprej preberemo in uredimo tabele od vkljucno 53 do 73. Dodamo stolpec 
 #(duration), ki nam pove dolzino voznje v sekundah in odstranimo stolpec
