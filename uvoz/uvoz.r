@@ -444,3 +444,54 @@ noaa <- read_csv(
       WT22 = FALSE
     )
   )
+names(noaa) <- tolower(names(noaa))
+
+#  Vse meritve vremenskih podatkov so v UCT, medtem ko so podatki za kolesa
+# zajeti v EST. Ko smo prebrali podatke jih je avtomaticno zapisal v UCT, 
+# zajeti so pa bili kot EST. To zdaj popravimo.
+
+tblCB <- tblCB %>%
+  mutate(
+    started_at = force_tz(started_at,'US/Eastern'),
+    ended_at = force_tz(ended_at,'US/Eastern')
+  )
+
+#  Prebrali bomo tudi SARS-CoV-2 podatke, ki jih zbira The New York Times na
+# svojem GitHub profilu (https://github.com/nytimes/covid-19-data).
+#  Izracunamo tudi novi stolpec, ki predstavlja 14 dnevno pojavnost na 100.000
+# prebivalcev. Da lahko to izracunamo moramo dodati 14 vrstic pred pojavom
+# prve okuzbe.
+
+DodatneVrstice <- tibble(
+  date = as_date(as_date('2020-02-22'):as_date('2020-03-06')),
+  cases_total = 0,
+  deaths_total =0
+)
+
+tblCV <- bind_rows(
+  DodatneVrstice,
+  read_csv(
+    'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv',
+    show_col_types = FALSE
+  ) %>% 
+    filter(
+      state == 'District of Columbia'
+    ) %>%
+    select(
+      -state,
+      -fips
+    ) %>%
+    rename(
+      cases_total = cases,
+      deaths_total = deaths
+    ) 
+) %>%
+  mutate(
+    date = as_date(date),
+    cases_today = cases_total - lag(cases_total),
+    deaths_today = deaths_total - lag(deaths_total),
+    cases_incidence = drseca_vsota(cases_today) * (1e5 / 701974)
+  ) %>%
+  replace(is.na(.), 0)
+
+rm(DodatneVrstice)

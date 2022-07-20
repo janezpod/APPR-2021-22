@@ -4,7 +4,7 @@ source('lib/libraries.r', encoding='UTF-8')
 `%ni%` <- Negate(`%in%`)
 
 # Sprejeme leto v formatu YYYY in je vkljucno od in do izbranega leta
-PrenosCB <- function(OdLeto = 2010, DoLeto = Odlet) {
+PrenosCB <- function(OdLeto = 2010, DoLeto = OdLeto) {
   bucket <- get_bucket('capitalbikeshare-data')
   bucket <- bucket[-length(bucket)]
   seznam <- vector('character', length(bucket))
@@ -38,4 +38,17 @@ ImenaStolpcev <- function(pattern) {
     k <- k +1
   }
   return(ImeStolpcevCB)
+}
+
+# 14-dnevno pojavnost izposojena iz ucilnice predmeta
+drseca_vsota = function(x, n = 14) {
+  cx = rep(0, length(x))
+  for (i in seq_along(x)) {
+    if (i < n) {
+      cx[i] = NA
+    } else {
+      cx[i] = sum(x[(i-n+1):i])
+    }
+  }
+  return(cx)
 }
