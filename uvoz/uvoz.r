@@ -77,11 +77,11 @@ tbl2 <-
     )
   ) %>%
   mutate(
-    duration = difftime(ended_at, started_at) %>%
+    duration = (ended_at - started_at) %>%
       as.duration() %>%
       as.numeric('seconds')
   ) %>%
-  select(
+  dplyr::select(
     -ride_id
   )
 
@@ -118,7 +118,7 @@ tbl1 <-
     end_station_name = 'End station',
     member_casual = 'Member type'
   ) %>%
-  select(
+  dplyr::select(
     -'Bike number'
   ) %>%
   mutate(
@@ -137,7 +137,7 @@ postaje_tbl2 <- tbl2$start_station_id %>%
 manjkajoce_postaje_id <- setdiff(postaje_tbl1,postaje_tbl2)
 
 manjkajoce_postaje <- tbl1 %>%
-  select(
+  dplyr::select(
     start_station_id,
     start_station_name
   ) %>%
@@ -171,7 +171,18 @@ tbl1 <- tbl1 %>%
       )
     )
 
-manjkajoce_postaje <- manjkajoce_postaje %>%
+manjkajoce_postaje <- tbl1 %>%
+  dplyr::select(
+    start_station_id,
+    start_station_name
+  ) %>%
+  filter(
+    start_station_id %in% manjkajoce_postaje_id
+  ) %>%
+  unique() %>%
+  arrange(
+    start_station_id
+    ) %>%
   add_column(
     start_lat = c(38.89959, 38.86292, 38.88362, 39.09420, 38.92360),
     start_lng = c(-77.04884, -77.05183, -76.95754, -77.13259, -77.23131)
@@ -182,7 +193,7 @@ manjkajoce_postaje <- manjkajoce_postaje %>%
 # povprecje. Na koncu dodamo se manjkajoce postaje in dobimo tabelo vseh postaj.
 
 postaje <- tbl2 %>%
-  select(
+  dplyr::select(
     station_name = start_station_name,
     station_id = start_station_id,
     start_lat,
@@ -310,7 +321,7 @@ tbl2 <- tbl2 %>%
   )
 
 postaje <- tbl2 %>%
-  select(
+  dplyr::select(
     station_name = start_station_name,
     station_id = start_station_id,
     start_lat,
@@ -337,20 +348,29 @@ postaje <- tbl2 %>%
   arrange(station_id)
 
 #  Ko imamo tabelo postaj in njihovih koordinat lahko iz tabele tbl2 odstranimo
-# koordinate, tabelo preuredimo in spnemo s tabelo tbl1.
+# koordinate, tabelo preuredimo in spnemo s tabelo tbl1. 
+#  Opazimo, da je imamo pri stoplcu 'member_casual' faktorje, ki se razlikujejo
+# le v veliki zacetnici, odstranimo tudi vnose, kjer je vrednost 'unknown' in 
+# stolpec premenujemo v 'member_type'. Stolpec rideable_type prav tako 
+# preoblikujemo v fakotrskega.
+#  Prav tako specificiramo, da so podatki o zacetku in koncu voznje zajeti 
+# v casovnem pasu EST.
+
 
 tblCB <- bind_rows(
   tbl1 <- tbl1 %>%
-    select(
+    dplyr::select(
+      duration,
       started_at,
       ended_at,
       start_station_id,
       end_station_id,
       member_casual,
       rideable_type
-      ),
+    ),
   tbl2 <- tbl2 %>%
-    select(
+    dplyr::select(
+      duration,
       started_at,
       ended_at,
       start_station_id,
@@ -358,10 +378,30 @@ tblCB <- bind_rows(
       member_casual,
       rideable_type
     )
-)
+) %>%
+  mutate(
+    started_at = force_tz(started_at,'US/Eastern'),
+    ended_at = force_tz(ended_at,'US/Eastern'),
+    member_casual = as.factor(tolower(member_casual)),
+    rideable_type = replace(
+      rideable_type,
+      rideable_type == 'docked_bike',
+      'classic_bike'
+    ),
+    rideable_type = as.factor(rideable_type),
+  ) %>%
+  filter(
+    member_casual != 'unknown'
+  ) %>%
+  rename(
+    member_type = member_casual
+  ) %>%
+  filter(
+    duration >= 0
+  )
 
-#  Dolgo casa sem se spraseval kaksna je razlika med 'docked_bike' in
-# 'classic_bike', saj v stolpcu ridable_type, saj slednji nenadoma izgine iz
+#  OPOMBA: Dolgo casa sem se spraseval kaksna je razlika med 'docked_bike' in
+# 'classic_bike', saj v stolpcu 'rideable_type', saj slednji nenadoma izgine iz
 # podatkov Aprila 2020 in je od takrat naprej naveden 'classic_bike', kasneje
 # pa se mu pridruzi se 'electric_bike'. Sumil sem, da so le preimenovali in da
 # razlik med njima ni. Potrdilo sem dobil v sledecem sporocilu:
@@ -378,12 +418,9 @@ tblCB <- bind_rows(
 # Regards,
 # lyft
 
-tblCB$rideable_type[tblCB$rideable_type=='docked_bike'] <- 'classic_bike'
-
 #  Pospravimo nepotrebne tabele in spremenljivke in sprostimo spomin.
 
 rm(
-  ImenaStolpcevCB,
   postaje_tbl1,
   postaje_tbl2,
   manjkajoce_postaje_id,
@@ -429,7 +466,7 @@ noaa <- read_csv(
     WT22 = col_logical()
   )
 ) %>%
-  select(
+  dplyr::select(
     -STATION,
     -FMTM,
     -PGTM,
@@ -458,16 +495,6 @@ noaa <- read_csv(
   )
 names(noaa) <- tolower(names(noaa))
 
-#  Vse meritve vremenskih podatkov so v UCT, medtem ko so podatki za kolesa
-# zajeti v EST. Ko smo prebrali podatke jih je avtomaticno zapisal v UCT, 
-# zajeti so pa bili kot EST. To zdaj popravimo.
-
-tblCB <- tblCB %>%
-  mutate(
-    started_at = force_tz(started_at,'US/Eastern'),
-    ended_at = force_tz(ended_at,'US/Eastern')
-  )
-
 #  Prebrali bomo tudi SARS-CoV-2 podatke, ki jih zbira The New York Times na
 # svojem GitHub profilu (https://github.com/nytimes/covid-19-data).
 #  Izracunamo tudi novi stolpec, ki predstavlja 14 dnevno pojavnost na 100.000
@@ -489,7 +516,7 @@ tblCV <- bind_rows(
     filter(
       state == 'District of Columbia'
     ) %>%
-    select(
+    dplyr::select(
       -state,
       -fips
     ) %>%
@@ -504,6 +531,29 @@ tblCV <- bind_rows(
     deaths_today = deaths_total - lag(deaths_total),
     cases_incidence = drseca_vsota(cases_today) * (1e5 / 701974)
   ) %>%
-  replace(is.na(.), 0)
+  replace(
+    is.na(.),
+    0
+  )
 
 rm(DodatneVrstice)
+gc()
+
+#  TABELA 1: Vkljucuje cas voznje, leto, mesec, letni cas, dan v tednu, tip
+# narocnine ('member_type') in tip kolesa ('rideable_type').
+
+tbl1 <- tblCB %>%
+  transmute(
+    duration = duration,
+    year = year(started_at),
+    month = month(started_at),
+    season = case_when(
+      month %in% c(12,1,2) ~ 1, #Zima
+      month %in% c(3,4,5) ~ 2, #Pomlad
+      month %in% c(6,7,8) ~ 3, # Poletje
+      month %in% c(9,10,11) ~ 4, # Jesen
+    ),
+    day = wday(started_at),
+    member_type = member_type,
+    rideable_type = rideable_type
+  )
