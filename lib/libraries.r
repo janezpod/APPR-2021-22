@@ -11,6 +11,10 @@ library(tidyverse)
 library(magrittr)
 library(aws.s3)
 library(lubridate)
+library(ggplot2)
+library(ggmap)
+library(RColorBrewer)
+library(wesanderson)
 
 options(gsubfn.engine="R")
 
