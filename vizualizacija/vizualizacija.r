@@ -33,9 +33,10 @@ graf1 <- tblG1 %>%
   labs(
     title = 'Število voženj po letih',
     x = 'Leto',
-    y = 'Število voženj',
+    y = 'Število voženj (v letih)',
     fill = 'Tip uporabnika',
-  ) 
+  ) +
+  theme_classic()
 
 #  Opazimo, da ustreza nasim pricakovanjem. Vec se vozijo tisti, ki imajo 
 # clanarino in splosni upad v stevilu vozenj leta 2020 je smiselen zaradi Covida.
@@ -54,9 +55,10 @@ graf2 <- tblG1 %>%
   labs(
     title = 'Skupni čas izposoje po letih',
     x = 'Leto',
-    y = 'Skupno čas izposoje (v letih)',
+    y = 'Skupno čas izposoje',
     fill = 'Tip uporabnika',
-  ) 
+  ) +
+  theme_classic()
 
 #  Morda je na prvi pogled presenetljivo, da si neclani, navkljub manjsemu
 # stevilu vozenj, koleas skupno izposodijo za dlje kot clani. Ena izmed moznih
@@ -96,7 +98,10 @@ graf3 <- tblG1 %>%
     row = vars(member_type),
     labeller = labeller(member_type = c('casual'='Nečlan', 'member'='Član'))
   ) + 
-  theme(legend.position="none")
+  theme(
+    legend.position="none"
+  ) +
+  theme_minimal()
   
 #  Pricakovano je povprecni cas voznje visji za neclane kot za clane. Zanimivo
 # je da se je povprecni cas vozenj povecal predvsem v spomladanskih in poletnih
@@ -127,7 +132,8 @@ graf4 <- tblG1 %>%
     col = vars(year),
     row = vars(member_type),
     labeller = labeller(member_type = c('casual'='Nečlan', 'member'='Član'))
-  )
+  ) +
+  theme_minimal()
 
 #  Ugotovimo, da je delitev na letne čase dovolj in, da z delitvijo na posamezne
 # mesece ne dobimo bistveno več uporabnih informacij. Hkrati opazimo ociten 
@@ -153,14 +159,15 @@ graf5 <- tblG1 %>%
   ) +
   labs(
     title = 'Primerjava števila voženj po dneh',
-    x = 'Dan',
+    x = 'Dan v tednu',
     y = 'Število voženj',
     fill = 'Letni čas'
   ) +
   facet_grid(
     row = vars(member_type),
     labeller = labeller(member_type = c('casual'='Nečlan', 'member'='Član'))
-  )
+  ) +
+  theme_minimal()
 
 #  Clani ocitno vec kolesarijo med delavnikom, medtem ko Neclani uporabljajo 
 # storitve bolj med vikendom
