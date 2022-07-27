@@ -4,23 +4,22 @@
 # obcutek kaj se sploh dogaja, nato bomo pocasi dodali ostale podatke.
 # Posebaj se bomo umejili na pre Covid podatke tj. do vkljucno leta 2019
 
-tbl <- tbl1 %>%
-  slice(which(row_number() %% 1000 == 1))
-
-# 1. graf: V katerih letih so se najveckrat izposodili kolo
-
 tblG1 <- tbl1 %>%
   group_by(
     year,
     month,
     season,
-    member_type
+    day,
+    member_type,
+    rideable_type
   ) %>%
   summarise(
     n = n(),
     dur = sum(duration)/ (60 * 24 * 365), # v letih
     dur_avg = dur / n * (24 * 365) # v minutah
   )
+
+# 1. graf: V katerih letih so se najveckrat izposodili kolo
 
 graf1 <- tblG1 %>%
   ggplot(
@@ -133,4 +132,83 @@ graf4 <- tblG1 %>%
 #  Ugotovimo, da je delitev na letne čase dovolj in, da z delitvijo na posamezne
 # mesece ne dobimo bistveno več uporabnih informacij. Hkrati opazimo ociten 
 # vpliv covida v mesecu Marcu in Aprilu leta 2020, ko za Clane stevilo vozenj
-# pade (ko bi moralo narasti).
+# pade (ko bi moralo narasti). Zanimivo je, da je upad vozenj pri clanih v 
+# zimskem casu manjsu kot pri neclanih. Morda se raven clanov v letu 2021 ni
+# vrnila nazaj tako visoko ker so si v tem casu kupili svoja kolesa.
+
+# 5. graf: Stevilo vozenj po dnevih in letih
+
+graf5 <- tblG1 %>%
+  ggplot(
+    mapping = aes(x = factor(day), y = n, fill = factor(season))
+  ) +
+  geom_col() +
+  scale_x_discrete(
+    limits = c('2', '3', '4', '5', '6', '7', '1'),
+    labels = c('PON', 'TOR', 'SRE', 'ČET', 'PET', 'SOB', 'NED')
+  ) +
+  scale_fill_manual(
+    labels = c('Zima', 'Pomlad', 'Poletje', 'Jesen'),
+    values = c('cornflowerblue', 'green3', 'orangered', 'orange2')
+  ) +
+  labs(
+    title = 'Primerjava števila voženj po dneh',
+    x = 'Dan',
+    y = 'Število voženj',
+    fill = 'Letni čas'
+  ) +
+  facet_grid(
+    row = vars(member_type),
+    labeller = labeller(member_type = c('casual'='Nečlan', 'member'='Član'))
+  )
+
+#  Clani ocitno vec kolesarijo med delavnikom, medtem ko Neclani uporabljajo 
+# storitve bolj med vikendom
+
+# 6. graf: Delez vozenj z elektricnimi kolesi (prvic se pojavijo Julija 2020)
+
+graf6 <- tblG1 %>%
+  filter(
+    year >= 2020,
+    month >= 6
+  ) %>%
+  group_by(
+    rideable_type
+  ) %>%
+  summarise(
+    n = sum(n)
+  ) %>%
+  mutate(
+    all = sum(n),
+    p = round((n / all) * 100)
+  ) %>%
+  select(
+    rideable_type,
+    p
+  ) %>%
+  ggplot(
+    mapping = aes(x = '', y = p, fill = factor(rideable_type))
+  ) +
+  geom_bar(
+    stat = 'identity',
+    width = 1
+  ) +
+  coord_polar(
+    'y'
+  ) +
+  geom_text(
+    aes(label = c('83 %', '17 %')),
+    position = position_stack(vjust = 0.5)
+  ) +
+  scale_fill_manual(
+    labels = c('Navadno kolo', 'Električno kolo'),
+    values = wes_palette('GrandBudapest1', 2)
+  ) +
+  labs(
+    title = 'Izposoja po tipu kolesa od Julija 2020 do konca leta 2021',
+    fill = 'Tip kolesa'
+  ) +
+  theme_void()
+
+#  Nesmiselno je primerjati cas voznje z elektricnim proti navadnim, saj nevemo
+# hitrosti. Vendar je 17 % nezamerljivo velik delez.
