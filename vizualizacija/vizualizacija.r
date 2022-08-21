@@ -218,7 +218,7 @@ zemljevid1 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
     legend= 'none'
   ) + 
   geom_point(
-    data = tblZ1,
+    data = postaje,
     aes(
       x=lng,
       y=lat
@@ -276,50 +276,6 @@ zemljevid2 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
   theme(
     legend.position = 'none'
   )
-
-#  Postaje urejene po številu izposoj
-
-tblZ1 <- left_join(
-  tblG2 %>%
-    rename(
-      station_id = start_station_id
-    ) %>%
-    group_by(
-      station_id
-    ) %>%
-    summarise(
-      izposoje = sum(n)
-    ),
-  postaje
-) %>%
-  arrange(
-    desc(izposoje)
-  ) %>%
-  drop_na(
-  ) %>%
-  slice(1:15)
-
-#  Postaje urejene po številu vrnitev
-
-tblZ2 <- left_join(
-  tblG2 %>%
-    rename(
-      station_id = end_station_id
-    ) %>%
-    group_by(
-      station_id
-    ) %>%
-    summarise(
-      vrnitve = sum(n)
-    ),
-  postaje
-) %>%
-  arrange(
-    desc(vrnitve)
-  ) %>%
-  drop_na(
-  ) %>%
-  slice(1:15)
 
 # 3. zemljevid: 15 najbolj prometnih postaj za izposojo kolesa
 

@@ -623,10 +623,54 @@ tblG4 <- left_join(
   by = 'date'
 )
 
-# TABELA 4:
+# TABELA 5:
 
 tblG5 <- left_join(
   tblG1,
   noaa,
   by = 'date'
 )
+
+# TABELA 6: Postaje urejene po številu izposoj
+
+tblZ1 <- left_join(
+  tblG2 %>%
+    rename(
+      station_id = start_station_id
+    ) %>%
+    group_by(
+      station_id
+    ) %>%
+    summarise(
+      izposoje = sum(n)
+    ),
+  postaje
+) %>%
+  arrange(
+    desc(izposoje)
+  ) %>%
+  drop_na(
+  ) %>%
+  slice(1:15)
+
+# TABELA 7: Postaje urejene po številu vrnitev
+
+tblZ2 <- left_join(
+  tblG2 %>%
+    rename(
+      station_id = end_station_id
+    ) %>%
+    group_by(
+      station_id
+    ) %>%
+    summarise(
+      vrnitve = sum(n)
+    ),
+  postaje
+) %>%
+  arrange(
+    desc(vrnitve)
+  ) %>%
+  drop_na(
+  ) %>%
+  slice(1:15)
