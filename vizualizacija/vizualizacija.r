@@ -206,8 +206,6 @@ graf6 <- tblG1 %>%
 #  Nesmiselno je primerjati cas voznje z elektricnim proti navadnim, saj nevemo
 # hitrosti. Vendar je 17 % nezamerljivo velik delez.
 
-
-
 # 1. zemljevid: Poglejmo kje se nahajajo postaje
 
 zemljevid1 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
@@ -297,6 +295,8 @@ tblZ1 <- left_join(
   arrange(
     desc(izposoje)
   ) %>%
+  drop_na(
+  ) %>%
   slice(1:15)
 
 #  Postaje urejene po številu vrnitev
@@ -316,6 +316,8 @@ tblZ2 <- left_join(
 ) %>%
   arrange(
     desc(vrnitve)
+  ) %>%
+  drop_na(
   ) %>%
   slice(1:15)
 
