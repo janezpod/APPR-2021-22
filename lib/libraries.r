@@ -1,3 +1,6 @@
+library(mosaic)
+library(rgeos)
+library(rgdal)
 library(knitr)
 library(rvest)
 library(gsubfn)
