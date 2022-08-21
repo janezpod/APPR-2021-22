@@ -539,6 +539,7 @@ gc()
 
 tblG1 <- tblCB %>%
   transmute(
+    date = date(started_at),
     duration = duration,
     year = year(started_at),
     month = month(started_at),
@@ -560,7 +561,8 @@ tblG1 <- tblCB %>%
     season,
     day,
     member_type,
-    rideable_type
+    rideable_type,
+    date
   ) %>%
   summarise(
     n = n(),
@@ -610,6 +612,21 @@ tblG3 <- tblCB %>%
     member_type = member_type,
     rideable_type = rideable_type
   )
-  
 
 rm(breaks, labels)
+
+# TABELA 4:
+
+tblG4 <- left_join(
+  tblG1,
+  tblCV,
+  by = 'date'
+)
+
+# TABELA 4:
+
+tblG5 <- left_join(
+  tblG1,
+  noaa,
+  by = 'date'
+)
