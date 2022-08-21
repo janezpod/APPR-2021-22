@@ -93,7 +93,7 @@ graf3 <- tblG1 %>%
 # je da se je povprecni cas vozenj povecal predvsem v spomladanskih in poletnih
 # casih. Zaradi zaprtosti doma so morda vec kolesarili v sprostitvene namene.
 
-# 4. graf: Ali je potrebna delitev na mesece (oz ali je delitev na letne čase
+# 4. graf: Ali je potrebna delitev na mesece (oz ali je delitev na letne case
 # dovolj) za stevilo vozenj
 
 graf4 <- tblG1 %>%
@@ -121,7 +121,7 @@ graf4 <- tblG1 %>%
   ) +
   theme_minimal()
 
-#  Ugotovimo, da je delitev na letne čase dovolj in, da z delitvijo na posamezne
+#  Ugotovimo, da je delitev na letne case dovolj in, da z delitvijo na posamezne
 # mesece ne dobimo bistveno več uporabnih informacij. Hkrati opazimo ociten 
 # vpliv covida v mesecu Marcu in Aprilu leta 2020, ko za Clane stevilo vozenj
 # pade (ko bi moralo narasti). Zanimivo je, da je upad vozenj pri clanih v 
@@ -137,13 +137,13 @@ graf5 <- tblG1 %>%
   geom_col() +
   scale_x_discrete(
     limits = c('2', '3', '4', '5', '6', '7', '1'),
-    labels = c('PON', 'TOR', 'SRE', 'ČET', 'PET', 'SOB', 'NED')
+    labels = c('PON', 'TOR', 'SRE', paste('\u010c', 'ET', sep = ''), 'PET', 'SOB', 'NED')
   ) +
   scale_fill_manual(
     labels = c('Zima', 'Pomlad', 'Poletje', 'Jesen'),
     values = c('cornflowerblue', 'green3', 'orangered', 'orange2')
   ) +
-  labs(
+  labs( 
     title = paste('Primerjava števila vo', '\u17e', 'enj po dneh', sep = ''),
     x = 'Dan v tednu',
     y = paste('Število vo', '\u17e', 'enj', sep = ''),
@@ -206,11 +206,182 @@ graf6 <- tblG1 %>%
 #  Nesmiselno je primerjati cas voznje z elektricnim proti navadnim, saj nevemo
 # hitrosti. Vendar je 17 % nezamerljivo velik delez.
 
-#############################
 
-#zemljevid
 
-# map_bounds <- c(left = 6, bottom = 47, right = 16, top = 56)
-# coords.map <- get_stamenmap(map_bounds, zoom = 6, maptype = "toner-lite")
-# coords.map <- ggmap(coords.map, extent="device", legend="none")
+# 1. zemljevid: Poglejmo kje se nahajajo postaje
 
+zemljevid1 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
+  get_stamenmap(
+    zoom = 11,
+    maptype = 'toner-lite'
+  ) %>%
+  ggmap(
+    extent = 'device',
+    legend= 'none'
+  ) + 
+  geom_point(
+    data = tblZ1,
+    aes(
+      x=lng,
+      y=lat
+      ),
+    fill = 'red',
+    shape = 23,
+    alpha = 0.6
+  ) +
+  labs(
+    x = 'Zemljepisna dolžina',
+    y = 'zemljepisna širina'
+  ) + 
+  ggtitle(
+    'Lokacija postaj'
+  ) +
+  theme_bw(
+  ) +
+  theme(
+    legend.position = 'none'
+  )
+
+# 2. zemljevid: Gostota postaj je bolje razvidna
+
+zemljevid2 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
+  get_stamenmap(
+    zoom = 11,
+    maptype = 'toner-lite'
+  ) %>%
+  ggmap(
+    extent = 'device',
+    legend= 'none'
+  ) + 
+  stat_density2d(
+    data = postaje,
+    aes( 
+      x=lng,
+      y=lat,
+      fill=..level..,
+      alpha=..level..
+      ),
+    geom="polygon"
+  ) +
+  scale_fill_gradientn(
+    colours = rev(brewer.pal(10, "Spectral"))
+  ) +
+  labs(
+    x = 'Zemljepisna dolžina',
+    y = 'zemljepisna širina'
+  ) + 
+  ggtitle(
+    'Gostota postaj'
+  ) +
+  theme_bw(
+  ) +
+  theme(
+    legend.position = 'none'
+  )
+
+#  Postaje urejene po številu izposoj
+
+tblZ1 <- left_join(
+  tblG2 %>%
+    rename(
+      station_id = start_station_id
+    ) %>%
+    group_by(
+      station_id
+    ) %>%
+    summarise(
+      izposoje = sum(n)
+    ),
+  postaje
+) %>%
+  arrange(
+    desc(izposoje)
+  ) %>%
+  slice(1:15)
+
+#  Postaje urejene po številu vrnitev
+
+tblZ2 <- left_join(
+  tblG2 %>%
+    rename(
+      station_id = end_station_id
+    ) %>%
+    group_by(
+      station_id
+    ) %>%
+    summarise(
+      vrnitve = sum(n)
+    ),
+  postaje
+) %>%
+  arrange(
+    desc(vrnitve)
+  ) %>%
+  slice(1:15)
+
+# 3. zemljevid: 15 najbolj prometnih postaj za izposojo kolesa
+
+zemljevid3 <- c(left = -77.07, bottom = 38.873, right = -76.975, top = 38.925) %>%
+  get_stamenmap(
+    zoom = 14,
+    maptype = 'toner-lite'
+  ) %>%
+  ggmap(
+    extent = 'device',
+    legend= 'none'
+  ) +
+  geom_point(
+    data = tblZ1,
+    aes(
+      x=lng,
+      y=lat,
+      fill = izposoje
+    ),
+    alpha = 0.6,
+    shape = 23,
+    size = 5
+  ) +
+  labs(
+    x = 'Zemljepisna dolžina',
+    y = 'zemljepisna širina',
+    fill = 'Izposoja koles'
+  ) + 
+  ggtitle(
+    '15 najbolj prometnih postaj'
+  ) +
+  theme_bw(
+  )
+
+# 4. zemljevid: 15 najbolj prometnih postaj za vrnitev kolesa
+
+zemljevid4 <- c(left = -77.07, bottom = 38.873, right = -76.975, top = 38.925) %>%
+  get_stamenmap(
+    zoom = 14,
+    maptype = 'toner-lite'
+  ) %>%
+  ggmap(
+    extent = 'device',
+    legend= 'none'
+  ) +
+  geom_point(
+    data = tblZ2,
+    aes(
+      x=lng,
+      y=lat,
+      fill = vrnitve
+    ),
+    alpha = 0.6,
+    shape = 23,
+    size = 5
+  ) +
+  
+  labs(
+    x = 'Zemljepisna dolžina',
+    y = 'zemljepisna širina',
+    fill = 'Vritve koles'
+  ) + 
+  ggtitle(
+    '15 najbolj prometnih postaj'
+  ) +
+  theme_bw(
+  )
