@@ -1,6 +1,6 @@
 ---
-title: "Poročilo pri predmetu Analiza podatkov s programom R"
-author: "Študent FMF"
+title: "Sistem za izposojo koles Capital Bikeshare"
+author: "Janez Podlogar"
 output:
   html_document: default
   pdf_document:
@@ -18,9 +18,18 @@ source("lib/libraries.r", encoding="UTF-8")
 ```
 
 
-## Izbira teme
+## Izbira teme in cilj
 
-***
+Capital Bikeshare je sistem za izposojo koles, ki se nahaja v Washington, D.C. in okolici. Po velikosti je tretji največji v Združenih državah Amerike.
+
+S povečovanjem pomena javnega prometa v povezavi z prehodom v brezogljično družbo so sistemi izposoje koles ena izmed rešitev zagotavljanlja mobilnosti na tranjostni način. Skupaj z nadgradnjo kolesarske infrastrukture (pogosto v škodo avtomobilom) postajajo kolesarji vse pomembnejši udeleženci v prometu. Obnašanje kolesarjev je, zato ključnega pomena za urbaniste in mestne odločevalce, ki poizušajo izboljšati mestno infrastukturo in se hkrati spopasti z avtomobilskimi izpuhi.
+
+Analiza omrežja in izposoje koles je zanimva prevsem v okviru dnevnih in sezonskih vremenskih vplivov. Prav tako je zanimiva v širšem kontekstu pandemije SARS-CoV-2, saj je le ta nenadno in korenito spremenila naše vsakodnevne navade.
+
+Cilj projekta je preučiti rast sistema skozi leta 2010 vse do vključno leta 2021. Sproti bomo analizirali vpliv vremena na obnašanje uporavnikov ter si pogledali vpliv epidemije v v letih 2020 in 2012. Za konec bomo naredili tudi napovedni model za število voženj v sistemu glede na vremenske razmere in številom primerov Covida.
+
+<center>
+![](slike/DC.jpg)
 
 ## Obdelava, uvoz in čiščenje podatkov
 
@@ -28,7 +37,58 @@ source("lib/libraries.r", encoding="UTF-8")
 source("uvoz/uvoz.r", encoding="UTF-8")
 ```
 
-***
+Podatki o izposojah koles sistema *Capital Bikeshare* so dostopni na [Amazon Web Service](https://s3.amazonaws.com/capitalbikeshare-data/index.html) v obliki CSV. Podatke sem prečistil in preuredil v primerno obliko za nadaljno analizo.
+
+Vremenske podatke sem pridobil od *National Oceanic and Atmospheric Administration* in sicer z vremenske postaje letališča [Ronald Reagan Washington National Airport](https://www.ncdc.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:USW00013743/detail).
+
+Podatke o epidimiji Covida sem pridobil z [Github repozitorija](https://github.com/nytimes/covid-19-data) častnika *New York Times*, ki jih uporablja za generiranja [sledilnika Covida](https://www.nytimes.com/interactive/2021/us/covid-cases.html)
+
+Vse podatke sem prečistil in preuredil v primerno obliko za nadaljno analizo. Temeljiti opisi in rešeitve vseh problemov na katere sem naletel med uvozom in obdelavo podatkov so zapisani v komentarjih med kodo.
+
+1. **tbCB** - Vsebuje podatke o vsaki posamezni izposoji:
+- `duration` - skupni čas izposoje
+- `started_at` - datum in ura izposoje
+- `ended_at` - datum in ura vrnitve
+- `start_station_id` - postaja izposoje
+- `end_station_id` - postaja vrnitve
+- `member_type` - tip uporabnika
+- `rideable_type` - tip kolesa
+
+2. **postaje** - Vsebuje podatke o kolesarskih postajah
+- `station_id` - identifikacijska številka 
+- `station_name` - ime 
+- `lat` - zemljepisna širina
+- `lng` - zemljepisna dolžina
+
+3. **noaa** - Prečiščeni in obdelani vremenski podatki
+- `date` - dan meritve
+- `awnd` - povprečna hitrost vetra
+- `prcp` - padavine
+- `snow` - sneženje
+- `snwd` - globina snega
+- `tavg` - povprečna temperatura
+- `tmax` - najvišja temperatura
+- `tmin` - najnižnja temperatura
+- `wt**` - klasifikacije vremena
+
+4. **tblCV** - Prečiščeni podatki o pandemiji SARS-CoV-2
+- `date` - dan meritve
+- `cases_total` - komulativno število potrjenih primerov okužbe
+- `deaths_today` - komulativno število smrti
+- `deaths_today` - število smrti na dan
+- `cases_today` - število okužb na dan
+- `cases_incidence` - štirinajstdnevna pojavnost okužb
+
+5. **tblG1** - Vsebuje podatke o vsaki posamezni izposoji kolesa:
+- `duration` - skupni čas izposoje
+- `year` - leto izposoje
+- `month` - mesec izposoje
+- `season` - letni čas izposoje
+- `day` - dan v tednu izposoje
+- `member_type` - tip uporabnika
+- `rideable_type` - tip kolesa
+- `start_station_id` - postaja izposoje
+- `end_station_id` - postaja vrnitve
 
 ## Analiza in vizualizacija podatkov
 
