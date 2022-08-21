@@ -464,35 +464,30 @@ noaa <- read_csv(
     WT18 = col_logical(),
     WT21 = col_logical(),
     WT22 = col_logical()
-  )
-) %>%
+    )
+  ) %>%
   dplyr::select(
     -STATION,
     -FMTM,
     -PGTM,
-    -WESD
-  ) %>%
-  replace_na(
-    list(
-      WT01 = FALSE,
-      WT02 = FALSE,
-      WT03 = FALSE,
-      WT04 = FALSE,
-      WT05 = FALSE,
-      WT06 = FALSE,
-      WT08 = FALSE,
-      WT09 = FALSE,
-      WT11 = FALSE,
-      WT13 = FALSE,
-      WT14 = FALSE,
-      WT15 = FALSE,
-      WT16 = FALSE,
-      WT17 = FALSE,
-      WT18 = FALSE,
-      WT21 = FALSE,
-      WT22 = FALSE
-    )
+    -WESD,
+    -WDF2,
+    -WDF5,
+    -WESD,
+    -WSF2,
+    -WSF5
+  )  %>%
+  mutate_if(
+    is.logical,
+    as.numeric
+  ) 
+
+noaa[9:25] <- noaa[9:25] %>%
+  replace(
+    is.na(.),
+    0
   )
+
 names(noaa) <- tolower(names(noaa))
 
 #  Prebrali bomo tudi SARS-CoV-2 podatke, ki jih zbira The New York Times na
@@ -542,7 +537,7 @@ gc()
 #  TABELA 1: Vkljucuje cas voznje, leto, mesec, letni cas, dan v tednu, tip
 # narocnine ('member_type') in tip kolesa ('rideable_type').
 
-tbl1 <- tblCB %>%
+tblG1 <- tblCB %>%
   transmute(
     duration = duration,
     year = year(started_at),
@@ -554,6 +549,67 @@ tbl1 <- tblCB %>%
       month %in% c(9,10,11) ~ 4, # Jesen
     ),
     day = wday(started_at),
+    member_type,
+    rideable_type,
+    start_station_id,
+    end_station_id
+  ) %>%
+  group_by(
+    year,
+    month,
+    season,
+    day,
+    member_type,
+    rideable_type
+  ) %>%
+  summarise(
+    n = n(),
+    dur = sum(duration)/ (60 * 24 * 365), # v letih
+    dur_avg = dur / n * (24 * 365) # v minutah
+  )
+
+# TABELA 2:
+
+tblG2 <- tblCB %>%
+  select(
+    duration,
+    start_station_id,
+    end_station_id
+  ) %>%
+  group_by(
+    start_station_id,
+    end_station_id
+  ) %>%
+  summarise(
+    n = n(),
+    dur = sum(duration)/ (60 * 24), # v urah
+    dur_avg = dur / n * (24) # v minutah
+  )
+  
+#                   Noč    Jutro  Podpoldne  Večer
+breaks <- hour(hm('00:00', '6:00', '12:00', '18:00', '23:59'))
+labels <- c(0, 1, 2, 3)
+
+# TABELA 3:
+
+tblG3 <- tblCB %>%
+  dplyr::select(
+    -ended_at
+  ) %>%
+  transmute(
+    date = date(started_at),
+    hour = hour(started_at),
+    time_of_day = 
+      cut(
+        x = hour,
+        breaks = breaks,
+        labels = labels,
+        include.lowest=TRUE
+        ),
+    duration = duration,
     member_type = member_type,
     rideable_type = rideable_type
   )
+  
+
+rm(breaks, labels)

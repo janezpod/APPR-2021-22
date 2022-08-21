@@ -2,22 +2,7 @@
 
 #  Najprej bomo malce na splosno pogledali le kolesarkse podatke, da dobimo
 # obcutek kaj se sploh dogaja, nato bomo pocasi dodali ostale podatke.
-# Posebaj se bomo umejili na pre Covid podatke tj. do vkljucno leta 2019
-
-tblG1 <- tbl1 %>%
-  group_by(
-    year,
-    month,
-    season,
-    day,
-    member_type,
-    rideable_type
-  ) %>%
-  summarise(
-    n = n(),
-    dur = sum(duration)/ (60 * 24 * 365), # v letih
-    dur_avg = dur / n * (24 * 365) # v minutah
-  )
+# Posebaj se bomo omejili na pred Covid podatke tj. do vkljucno leta 2019
 
 # 1. graf: V katerih letih so se najveckrat izposodili kolo
 
@@ -31,9 +16,9 @@ graf1 <- tblG1 %>%
     values = wes_palette('Zissou1', 2)
   ) +
   labs(
-    title = 'Število voženj po letih',
+    title = paste('Število vo', '\u17e', 'enj po letih', sep = ''),
     x = 'Leto',
-    y = 'Število voženj (v letih)',
+    y = paste('Število vo', '\u17e', 'enj (v letih)', sep = ''),
     fill = 'Tip uporabnika',
   ) +
   theme_classic()
@@ -53,9 +38,9 @@ graf2 <- tblG1 %>%
     values = wes_palette('Zissou1', 2)
   ) +
   labs(
-    title = 'Skupni čas izposoje po letih',
+    title = paste('Skupni ', '\u010d' , 'as izposoje po letih', sep = ''),
     x = 'Leto',
-    y = 'Skupno čas izposoje',
+    y = paste('Skupni ', '\u010d' , 'as izposoje', sep = ''),
     fill = 'Tip uporabnika',
   ) +
   theme_classic()
@@ -89,9 +74,10 @@ graf3 <- tblG1 %>%
     labels = c('Zima', 'Pomlad', 'Poletje', 'Jesen'),
   ) + 
   labs(
-    title = 'Povprecni čas izposoje po letnem času',
-    x = 'Letni čas',
-    y = 'Povprečni čas izposoje (v minutah)',
+    title = paste('Povprecni ', '\u010d', 'as izposoje po letnem ', '\u010d', 'asu', sep = ''),
+    x = paste('Letni ', '\u010d' , 'as', sep = ''),
+    y = paste('Povprecni ', '\u010d', 'as izposoje (v minutah)', sep = ''),
+    fill = paste('Letni ', '\u010d', 'as', sep  = ''),
   ) +
   facet_grid(
     col = vars(year),
@@ -123,10 +109,10 @@ graf4 <- tblG1 %>%
     values = c('cornflowerblue', 'green3', 'orangered', 'orange2')
   ) +
   labs(
-    title = 'Primerjava števila voženj po letihi in mesecih',
+    title = paste('Primerjava števila vo', '\u17e', 'enj po letihi in mesecih', sep = ''),
     x = 'Mesec',
-    y = 'Število voženj',
-    fill = 'Letni čas',
+    y = paste('Število vo', '\u17e', 'enj', sep = ''),
+    fill = paste('Letni ', '\u010d', 'as', sep  = ''),
   ) +
   facet_grid(
     col = vars(year),
@@ -158,10 +144,10 @@ graf5 <- tblG1 %>%
     values = c('cornflowerblue', 'green3', 'orangered', 'orange2')
   ) +
   labs(
-    title = 'Primerjava števila voženj po dneh',
+    title = paste('Primerjava števila vo', '\u17e', 'enj po dneh', sep = ''),
     x = 'Dan v tednu',
-    y = 'Število voženj',
-    fill = 'Letni čas'
+    y = paste('Število vo', '\u17e', 'enj', sep = ''),
+    fill = paste('Letni ', '\u010d', 'as', sep  = '')
   ) +
   facet_grid(
     row = vars(member_type),
@@ -219,3 +205,12 @@ graf6 <- tblG1 %>%
 
 #  Nesmiselno je primerjati cas voznje z elektricnim proti navadnim, saj nevemo
 # hitrosti. Vendar je 17 % nezamerljivo velik delez.
+
+#############################
+
+#zemljevid
+
+# map_bounds <- c(left = 6, bottom = 47, right = 16, top = 56)
+# coords.map <- get_stamenmap(map_bounds, zoom = 6, maptype = "toner-lite")
+# coords.map <- ggmap(coords.map, extent="device", legend="none")
+
