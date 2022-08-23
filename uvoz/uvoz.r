@@ -3,11 +3,11 @@
 source('lib/funkcije.r', encoding='UTF-8')
 sl <- locale("sl", decimal_mark=",", grouping_mark=".")
 
+#  POZOR: Prenos traja kar nekaj casa, saj so podatki o kolesarskih vožnjah
+# skupaj veliki cca. 4 Gb
 #  Podatki o zgodovini vozenj s kolesi se zacenjo leta 2010. Do vkljucno leta
 # 2017 so bili podatki na AWS nalozeni letno oz. cetrtletno, poznejsi pa so
 # nalozeni mesecno.
-#  POZOR: Prenos traja kar nekaj casa, saj so podatki o kolesarskih vožnjah
-# skupaj veliki cca. 4 Gb
 
 if (
   identical(
@@ -570,7 +570,8 @@ tblG1 <- tblCB %>%
     dur_avg = dur / n * (24 * 365) # v minutah
   )
 
-# TABELA 2:
+#  TABELA 2: Vse relacije postaj z številom voženj, skupnim časom vseh voženj
+# in z povprečnim časom vožnje na relaciji
 
 tblG2 <- tblCB %>%
   select(
@@ -592,7 +593,12 @@ tblG2 <- tblCB %>%
 breaks <- hour(hm('00:00', '6:00', '12:00', '18:00', '23:59'))
 labels <- c(0, 1, 2, 3)
 
-# TABELA 3:
+#  TABELA 3: Vkljucuje datum voznje, uro začetka, čas v dnevu (noč, jutro,
+# popoldne, večer), čas vožnje, tip naročnine in tip kolesa.
+
+#                   Noč    Jutro  Podpoldne  Večer
+breaks <- hour(hm('00:00', '6:00', '12:00', '18:00', '23:59'))
+labels <- c(0, 1, 2, 3)
 
 tblG3 <- tblCB %>%
   dplyr::select(
@@ -615,15 +621,19 @@ tblG3 <- tblCB %>%
 
 rm(breaks, labels)
 
-# TABELA 4:
+#  TABELA 4: Združitev tabele 1 s tblCV (Covid-10)
 
 tblG4 <- left_join(
   tblG1,
   tblCV,
   by = 'date'
-)
+) %>%
+  replace(
+    is.na(.),
+    0
+  )
 
-# TABELA 5:
+#  TABELA 5: Združitev tabele 1 z noaa (vreme)
 
 tblG5 <- left_join(
   tblG1,
@@ -631,7 +641,7 @@ tblG5 <- left_join(
   by = 'date'
 )
 
-# TABELA 6: Postaje urejene po številu izposoj
+#  TABELA 6: Postaje urejene po številu izposoj
 
 tblZ1 <- left_join(
   tblG2 %>%
@@ -653,7 +663,7 @@ tblZ1 <- left_join(
   ) %>%
   slice(1:15)
 
-# TABELA 7: Postaje urejene po številu vrnitev
+#  TABELA 7: Postaje urejene po številu vrnitev
 
 tblZ2 <- left_join(
   tblG2 %>%
@@ -674,3 +684,39 @@ tblZ2 <- left_join(
   drop_na(
   ) %>%
   slice(1:15)
+
+#  TABELA 8: Tabela za analizo. Tam kjer nimamo podatkov za tavg (povprečna 
+# dnevna temperatra) jih zamenjamo z tavg_avg, ki jo izračunamo za vsak mesec iz
+# mesecev kjer imamo tavg in ustavrimo stolpec tavg_aug.
+
+tblM <- left_join(
+  tblG4,
+  noaa,
+  by = 'date'
+  ) %>%
+  left_join(
+    .,
+    avg_month_temp <- noaa %>%
+      drop_na() %>%
+      mutate(
+        month = month(date)
+      ) %>%
+      group_by(
+        month
+      ) %>%
+      summarise(
+        tavg_month = mean(tavg)
+      ),
+    by = 'month'
+  ) %>%
+  mutate(
+    tavg_aug = coalesce(
+      tavg,
+      tavg_month
+    )
+  ) %>%
+  select(
+    -tavg,
+    -tavg_month
+  )
+  

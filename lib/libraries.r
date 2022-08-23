@@ -18,6 +18,10 @@ library(ggplot2)
 library(ggmap)
 library(RColorBrewer)
 library(wesanderson)
+library(GGally)
+library(ranger)
+library(caret)
+library(funModeling)
 
 options(gsubfn.engine="R")
 
