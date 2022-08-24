@@ -183,7 +183,13 @@ Graf ponovno pokaže, da je delitev glede na tip naročnine zelo pomembna, saj s
 print(graf9)
 ```
 
-Videle smo že, da je število voženj močno povezano z letnim časom, ki je seveda povezan z povprečno temperaturo. Jasno je, da se bo več voženj opravilo pri višjih temperaturah.
+Opazili smo že, da je število voženj močno povezano z letnim časom, ki je seveda povezan z povprečno temperaturo. Jasno je, da se bo več voženj opravilo pri višjih temperaturah.
+
+```{r}
+print(graf10)
+```
+
+Škatle z brki nam pričakovano pokažejo, da poleg temperature tudi ostale vremenske razmere vplivajo na število prevozov. V splošnem lepše kot je vreme, več izposoj je opravljenih.
 
 ```{r}
 print(zemljevid1)

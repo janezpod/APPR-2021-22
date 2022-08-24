@@ -355,7 +355,55 @@ graf9 <- tblG5 %>%
   theme_minimal(
   )
 
-# 1. zemljevid: Poglejmo kje se nahajajo postaje
+#  10. graf: Vplivp vremena
+
+graf10 <- tblG5 %>%
+  ungroup(
+  ) %>%
+  select(
+    n,
+    dur_avg,
+    member_type,
+    wt01,
+    wt05,
+    wt11,
+    wt16,
+    wt18,
+  ) %>%
+  pivot_longer(
+    .,
+    cols = c(wt01, wt05, wt11, wt16, wt18),
+    names_to = 'weather',
+    values_to = 'weather_logical'
+  ) %>%
+  ggplot(
+  ) +
+  geom_boxplot(
+    aes(
+      x = factor(weather_logical),
+      y = n
+    )
+  ) +
+  labs( 
+    title = 'Škatle z brki glede na kazalce vremena',
+    x = paste('Logi', '\u010d', 'ni indikator vremena', sep = ''),
+    y = paste('Število vo', '\u17e', 'enj', sep = '')
+  ) +
+  facet_grid(
+    cols = vars(weather),
+    labeller = labeller(
+      weather = c(
+        'wt01' = 'Megla',
+        'wt05' = paste('To', '\u010d', 'a', sep = ''),
+        'wt11' = paste('Mo', '\u010d', 'ni vetrovi', sep = ''),
+        'wt16' = 'Dež',
+        'wt18' = 'Sneg'
+      )
+    )
+  ) + 
+  theme_bw()
+
+#  1. zemljevid: Poglejmo kje se nahajajo postaje
 
 zemljevid1 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
   get_stamenmap(
@@ -389,7 +437,7 @@ zemljevid1 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
     legend.position = 'none'
   )
 
-# 2. zemljevid: Gostota postaj je bolje razvidna
+#  2. zemljevid: Gostota postaj je bolje razvidna
 
 zemljevid2 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
   get_stamenmap(
@@ -426,7 +474,7 @@ zemljevid2 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
     legend.position = 'none'
   )
 
-# 3. zemljevid: 15 najbolj prometnih postaj za izposojo kolesa
+#  3. zemljevid: 15 najbolj prometnih postaj za izposojo kolesa
 
 zemljevid3 <- c(left = -77.07, bottom = 38.873, right = -76.975, top = 38.925) %>%
   get_stamenmap(
@@ -459,7 +507,7 @@ zemljevid3 <- c(left = -77.07, bottom = 38.873, right = -76.975, top = 38.925) %
   theme_bw(
   )
 
-# 4. zemljevid: 15 najbolj prometnih postaj za vrnitev kolesa
+#  4. zemljevid: 15 najbolj prometnih postaj za vrnitev kolesa
 
 zemljevid4 <- c(left = -77.07, bottom = 38.873, right = -76.975, top = 38.925) %>%
   get_stamenmap(
