@@ -14,7 +14,7 @@ Capital Bikeshare je sistem za izposojo koles, ki se nahaja v Washington, D.C. i
 
 ## Program
 
-POZOR: Program ob prvem zagonu sam prenese podatke z [Amazon Web Service](https://s3.amazonaws.com/capitalbikeshare-data/index.html). Prenos traja kar nekaj časa, saj so podatki o kolesarskih vožnjah skupaj veliki cca. 4 Gb.
+POZOR: Program ob prvem zagonu prenese podatke z [Amazon Web Service](https://s3.amazonaws.com/capitalbikeshare-data/index.html). Prenos traja kar nekaj časa, saj so podatki o kolesarskih vožnjah skupaj veliki cca. 4 Gb.
 
 Glavni program in poročilo se nahajata v datoteki `projekt.Rmd`.
 Ko ga prevedemo, se izvedejo programi, ki ustrezajo drugi, tretji in četrti fazi projekta:
