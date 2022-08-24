@@ -135,15 +135,13 @@ Začeli bomo z analizo voženj in postaj
 source("vizualizacija/vizualizacija.r", encoding="UTF-8")
 ```
 
-```{r}
+```{r, figures-a, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
 print(graf1)
+print(graf2)
 ```
 
 Prvi graf v celoti ustreza našim pričakovanjem. Število voženj se z časom (in rastjo omrežja) povečuje in v letih, ko nastopi pandemija silovito pade, a se naslednje leto že skoraj povrne na predpandemično raven. Prav tako je smiselno, da se člani. Malce nas preseneti, da v letih 2020 upade število voženj, ki jih opravijo člani, a število voženj nečlanov naraste. Morda so ljudje zaradi omejitev (delo od doma) kolesarili manj in se jim je zato bolj splačalo plačat dražjo posamezno vožnjo in prišparati denar pri naročnini.
-
-```{r}
-print(graf2)
-```
 
 Drugi graf nas že malo preseneti. Čeprav nečlani opravijo manj voženj, se vozijo dlje časa. Zanimivo je, da se je navkljub upadu vozenj v letih 2020 in 2021 skupni čas izposoje povečal. Ugibamo, da so ljudje raje namesto avtobusa in ostalih potniških storitev tudi za daljše prevoze posegli po kolesu pa čeprav manjkrat. Morda so si kolo izposodili za daljše rekreacijske vožnje in ne za vsakodnevne vožnje v službo in nazaj.
 
@@ -178,15 +176,3 @@ print(graf7)
 Če na prejšnji graf vnesemo še podatke o povprečni 14 dnevni incidenca, vidimo, da se v prvem valu močno zmanjša število voženj. Poleti, ko je primrov Covida manj se tudi število voženj poveča. Pozimi ob drugem valu pa se ponovno zniža bolj kot v letih poprej. V letu 2022 je število voženj bistveno manj odvisno od števila primerov kot v letu 2021, saj se je tako odnos kot tudi pandemija sama korenito spremenila.
 
 ***
-
-## Napredna analiza podatkov
-
-```{r analiza,results='hide'}
-source("analiza/analiza.r", encoding="UTF-8")
-```
-
-***
-
-```{r shiny}
-shinyAppDir("shiny", options=list(width="100%"))
-```

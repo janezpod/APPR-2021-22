@@ -21,7 +21,7 @@ graf1 <- tblG1 %>%
   labs(
     title = paste('Število vo', '\u17e', 'enj po letih', sep = ''),
     x = 'Leto',
-    y = paste('Število vo', '\u17e', 'enj (v letih)', sep = ''),
+    y = paste('Število vo', '\u17e', 'enj', sep = ''),
     fill = 'Tip uporabnika',
   ) +
   theme_classic()
@@ -46,7 +46,7 @@ graf2 <- tblG1 %>%
   labs(
     title = paste('Skupni ', '\u010d' , 'as izposoje po letih', sep = ''),
     x = 'Leto',
-    y = paste('Skupni ', '\u010d' , 'as izposoje', sep = ''),
+    y = paste('Skupni ', '\u010d' , 'as izposoje  (v letih)', sep = ''),
     fill = 'Tip uporabnika',
   ) +
   theme_classic()
@@ -90,10 +90,12 @@ graf3 <- tblG1 %>%
     row = vars(member_type),
     labeller = labeller(member_type = c('casual'='Nečlan', 'member'='Član'))
   ) + 
-  theme(
-    legend.position="none"
+  theme_minimal(
   ) +
-  theme_minimal()
+  theme(
+    axis.text.x = element_text(angle = 45, vjust = 0.5),
+    axis.title.x = element_text(vjust = 0)
+  )
   
 #  Pricakovano je povprecni cas voznje visji za neclane kot za clane. Zanimivo
 # je da se je povprecni cas vozenj povecal predvsem v spomladanskih in poletnih
@@ -114,6 +116,9 @@ graf4 <- tblG1 %>%
     labels = c('Zima', 'Pomlad', 'Poletje', 'Jesen'),
     values = c('cornflowerblue', 'green3', 'orangered', 'orange2')
   ) +
+  scale_x_discrete(
+    labels = c('JAN', 'FEB', 'MAR', 'APR', 'MAj', 'JUN', 'JU', 'AVG', 'SEP', 'OKT', 'NOV', 'DEC')
+  ) +
   labs(
     title = paste('Primerjava števila vo', '\u17e', 'enj po letihi in mesecih', sep = ''),
     x = 'Mesec',
@@ -125,7 +130,12 @@ graf4 <- tblG1 %>%
     row = vars(member_type),
     labeller = labeller(member_type = c('casual'='Nečlan', 'member'='Član'))
   ) +
-  theme_minimal()
+  theme_minimal(
+  ) +
+  theme(
+    axis.text.x = element_text(size= rel(0.8), angle=90)
+  )
+
 
 #  Ugotovimo, da je delitev na letne case dovolj in, da z delitvijo na posamezne
 # mesece ne dobimo bistveno več uporabnih informacij. Hkrati opazimo ociten 
@@ -134,7 +144,7 @@ graf4 <- tblG1 %>%
 # zimskem casu manjsu kot pri neclanih. Morda se raven clanov v letu 2021 ni
 # vrnila nazaj tako visoko ker so si v tem casu kupili svoja kolesa.
 
-# 5. graf: Stevilo vozenj po dnevih in letih
+# 5. graf: Stevilo vozenj po dnevih
 
 graf5 <- tblG1 %>%
   ggplot(
@@ -159,7 +169,7 @@ graf5 <- tblG1 %>%
     row = vars(member_type),
     labeller = labeller(member_type = c('casual'='Nečlan', 'member'='Član'))
   ) +
-  theme_minimal()
+  theme_minimal() 
 
 #  Clani ocitno vec kolesarijo med delavnikom, medtem ko Neclani uporabljajo 
 # storitve bolj med vikendom
@@ -248,6 +258,9 @@ graf7 <- tblG4 %>%
     labels = c('Zima', 'Pomlad', 'Poletje', 'Jesen'),
     values = c('cornflowerblue', 'green3', 'orangered', 'orange2')
   ) +
+  scale_x_discrete(
+    labels = c('JAN', 'FEB', 'MAR', 'APR', 'MAj', 'JUN', 'JU', 'AVG', 'SEP', 'OKT', 'NOV', 'DEC')
+  ) +
   labs( 
     title = paste('Število vo', '\u17e', 'enj in Covid-19', sep = ''),
     x = 'Mesec',
@@ -261,7 +274,11 @@ graf7 <- tblG4 %>%
   scale_y_continuous(
     sec.axis = sec_axis(~.*10e-3 / 3, name = 'Povprečna mesečna 14 incidenca')
   ) +
-  theme_minimal()
+  theme_minimal(
+  ) +
+  theme(
+    axis.text.x = element_text(size= rel(0.8), angle=90)
+  )
 
 #  Nesmiselno je primerjati cas voznje z elektricnim proti navadnim, saj nevemo
 # hitrosti. Vendar je 17 % nezamerljivo velik delez.
@@ -319,10 +336,10 @@ zemljevid2 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
       fill=..level..,
       alpha=..level..
       ),
-    geom="polygon"
+    geom='polygon'
   ) +
   scale_fill_gradientn(
-    colours = rev(brewer.pal(10, "Spectral"))
+    colours = rev(brewer.pal(10, 'Spectral'))
   ) +
   labs(
     x = 'Zemljepisna dolžina',
