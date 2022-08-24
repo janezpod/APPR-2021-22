@@ -80,9 +80,9 @@ graf3 <- tblG1 %>%
     labels = c('Zima', 'Pomlad', 'Poletje', 'Jesen'),
   ) + 
   labs(
-    title = paste('Povprecni ', '\u010d', 'as izposoje po letnem ', '\u010d', 'asu', sep = ''),
+    title = paste('Povpre', '\u010d' ,'ni ', '\u010d', 'as izposoje po letnem ', '\u010d', 'asu', sep = ''),
     x = paste('Letni ', '\u010d' , 'as', sep = ''),
-    y = paste('Povprecni ', '\u010d', 'as izposoje (v minutah)', sep = ''),
+    y = paste('Povpre', '\u010d', 'ni ', '\u010d', 'as izposoje (v minutah)', sep = ''),
     fill = paste('Letni ', '\u010d', 'as', sep  = ''),
   ) +
   facet_grid(
@@ -217,7 +217,7 @@ graf6 <- tblG1 %>%
     values = wes_palette('GrandBudapest1', 2)
   ) +
   labs(
-    title = 'Izposoja po tipu kolesa od Julija 2020 do konca leta 2021',
+    title = 'Izposoja po tipu kolesa od julija 2020 do konca leta 2021',
     fill = 'Tip kolesa'
   ) +
   theme_void()
@@ -275,7 +275,7 @@ graf7 <- tblG4 %>%
     labeller = labeller(member_type = c('casual'='Nečlan', 'member'='Član'))
   ) +
   scale_y_continuous(
-    sec.axis = sec_axis(~.*10e-3 / 3, name = 'Povprečna mesečna 14 incidenca')
+    sec.axis = sec_axis(~.*10e-3 / 3, name = 'Povprečna mesečna 14 dnevna incidenca')
   ) +
   theme_minimal(
   ) +
@@ -299,7 +299,7 @@ graf8 <- tblG3 %>%
     )
   ) +
   scale_fill_manual(
-    labels = c('Noč', 'Jutro', 'Popoldne', 'Večer'),
+    labels = c('Noč', 'Jutro', 'Popoldan', 'Večer'),
     values = wes_palette('Zissou1', 4)
   ) +
   scale_x_discrete(
@@ -307,7 +307,7 @@ graf8 <- tblG3 %>%
   ) +
   labs( 
     title = paste('Število vo', '\u17e', 'enj po urah v dnevu', sep = ''),
-    x = 'Mesec',
+    x = 'Ura',
     y = paste('Število vo', '\u17e', 'enj', sep = ''),
     fill = 'Del dneva'
   ) +

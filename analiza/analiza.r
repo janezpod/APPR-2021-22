@@ -263,22 +263,6 @@ tblN <- bind_rows(
 # curve(predict(lin.model1b,newdata=data.frame(tavg_aug=x,member_type='casual')),col=1,add=T)
 # curve(predict(lin.model1b,newdata=data.frame(tavg_aug=x,member_type='member')),col=2,add=T)
 
-
-rm(
-  tr,
-  tblM_testni,
-  tblM_ucni,
-  tblM1,
-  tblM1_testni,
-  tblM1_ucni,
-  tblM2,
-  tblM2_testni,
-  tblM2_ucni,
-  tblM3_testni,
-  tblM3_ucni,
-  tblMk
-)
-
 grafN1 <- tblN %>%
   pivot_longer(
     .,

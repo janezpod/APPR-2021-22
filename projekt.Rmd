@@ -19,13 +19,13 @@ source("lib/libraries.r", encoding="UTF-8")
 
 ## Izbira teme in cilji
 
-Capital Bikeshare je sistem za izposojo koles, ki se nahaja v Washington, D.C., in okolici. Po velikosti je tretji največji sistem za izposojo koles v Združenih državah Amerike.
+*Capital Bikeshare* je sistem za izposojo koles, ki se nahaja v Washington, D.C. in okolici. Po velikosti je tretji največji sistem za izposojo koles v Združenih državah Amerike.
 
-S povečevanjem pomena javnega prometa v povezavi s prehodom v brezogljično družbo so sistemi izposoje ena izmed rešitev zagotavljanlja mobilnosti na tranjostni način. Skupaj z nadgradnjo kolesarske infrastrukture (pogosto v škodo avtomobilom) postajajo kolesarji vse pomembnejši udeleženci v prometu. Obnašanje kolesarjev je zato ključnega pomena za urbaniste in mestne odločevalce, ki želijo izboljšati pretočnost mestnega prometa in se hkrati spopasti z avtomobilskimi izpuhi.
+S povečevanjem pomena javnega prometa v povezavi s prehodom v brezogljično družbo so sistemi izposoje ena izmed rešitev, ki zagotavljajo zagotavljanlja mobilnosti na tranjostni način. Skupaj z nadgradnjo kolesarske infrastrukture (pogosto v škodo avtomobilom) postajajo kolesarji vse pomembnejši udeleženci v prometu. Obnašanje kolesarjev je zato ključnega pomena za urbaniste in mestne odločevalce, ki želijo izboljšati pretočnost mestnega prometa in se hkrati spopasti z izpušnimi plini.
 
-Analiza omrežja in izposoje koles je zanimva prevsem v okviru dnevnih in sezonskih vremenskih vplivov. Prav tako je zanimiva v širšem kontekstu pandemije SARS-CoV-2, saj je le ta nenadno in korenito spremenila naše vsakodnevne navade.
+Analiza omrežja in izposoje koles je zanimiva prevsem v okviru dnevnih in sezonskih vremenskih vplivov. Prav tako je zanimiva v širšem kontekstu pandemije SARS-CoV-2, ki je nenadno in korenito spremenila naše vsakodnevne navade.
 
-Cilj projekta je analizirali vpliv vremena na obnašanje uporabnikov ter si pogledali vpliv epidemije v v letih 2020 in 2012. Za konec bomo naredili tudi napovedni model za število voženj v sistemu glede na vremenske razmere in številom primerov Covida.
+Cilj projekta je analizirati vpliv vremena na obnašanje uporabnikov ter prikazati vpliv epidemije v letih 2020 in 2021. Naredili bomo tudi napovedni model za število voženj glede na vremenske razmere in število primerov Covida.
 
 <center>
 ![](slike/DC.jpg)
@@ -40,15 +40,15 @@ source("uvoz/uvoz.r", encoding="UTF-8")
 
 Podatki o izposoji koles *Capital Bikeshare* so dostopni na [Amazon Web Service](https://s3.amazonaws.com/capitalbikeshare-data/index.html) v obliki CSV.
 
-Vremenske podatke sem pridobil od *National Oceanic and Atmospheric Administration* in sicer z vremenske postaje letališča [Ronald Reagan Washington National Airport](https://www.ncdc.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:USW00013743/detail).
+Vremenske podatke smo pridobili od *National Oceanic and Atmospheric Administration* in sicer z vremenske postaje letališča [Ronald Reagan Washington National Airport](https://www.ncdc.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:USW00013743/detail).
 
-Podatke o epidimiji Covida sem pridobil z [Github repozitorija](https://github.com/nytimes/covid-19-data) častnika *New York Times*, ki jih zbira za generiranja [Covida sledilnika](https://www.nytimes.com/interactive/2021/us/covid-cases.html)
+Podatke o epidimiji Covida smo pridobili z [Github repozitorija](https://github.com/nytimes/covid-19-data) častnika *New York Times*, ki jih zbira za generiranje [Covid sledilnika](https://www.nytimes.com/interactive/2021/us/covid-cases.html).
 
-Vse podatke sem prečistil in preuredil v primerno obliko za nadaljno analizo. Temeljiti opisi in rešeitve vseh problemov na katere sem naletel med uvozom in obdelavo podatkov so zapisani v komentarjih med kodo.
+Vse podatke smo prečistili in preuredili v primerno obliko za nadaljno analizo. Temeljiti opisi in rešitve vseh problemov na katere naletelimo med uvozom in obdelavo podatkov so zapisani v komentarjih med kodo.
 
 ### Tabele
 
-Prve štiri tabele predstavljajo prečiščene podatke. Tabele poimenovane tblG* sem uporabljal za risanje grafov, tabele poimenovane tblZ* za risanje zemljevidov ter tabelo tblM za napredno analizo podatkov.
+Prve štiri tabele predstavljajo prečiščene podatke. Tabele poimenovane tblG* uporabimo za risanje grafov, tabele poimenovane tblZ* za risanje zemljevidov ter tabelo tblM za napredno analizo podatkov.
 
 1. **tbCB** - Vsebuje podatke o vsaki posamezni izposoji:
 - `duration` - čas izposoje
@@ -59,24 +59,24 @@ Prve štiri tabele predstavljajo prečiščene podatke. Tabele poimenovane tblG*
 - `member_type` - tip uporabnika
 - `rideable_type` - tip kolesa
 
-2. **postaje** - Vsebuje podatke o kolesarskih postajah
+2. **postaje** - Vsebuje podatke o kolesarskih postajah:
 - `station_id` - identifikacijska številka 
-- `station_name` - ime 
+- `station_name` - ime
 - `lat` - zemljepisna širina
 - `lng` - zemljepisna dolžina
 
-3. **noaa** - Prečiščeni in obdelani vremenski podatki
+3. **noaa** - Prečiščeni in obdelani vremenski podatki:
 - `date` - dan meritve
 - `awnd` - povprečna hitrost vetra
-- `prcp` - količina padavin
+- `prcp` - količina dežja
 - `snow` - količina snega
 - `snwd` - globina snega
 - `tavg` - povprečna temperatura
 - `tmax` - najvišja temperatura
 - `tmin` - najnižnja temperatura
-- `wt**` - klasifikacije vremena
+- `wt**` - indikator vremena
 
-4. **tblCV** - Prečiščeni podatki o pandemiji SARS-CoV-2
+4. **tblCV** - Prečiščeni podatki o pandemiji SARS-CoV-2:
 - `date` - dan meritve
 - `cases_total` - komulativno število potrjenih primerov okužbe
 - `deaths_today` - komulativno število smrti
@@ -84,7 +84,7 @@ Prve štiri tabele predstavljajo prečiščene podatke. Tabele poimenovane tblG*
 - `cases_today` - število okužb na dan
 - `cases_incidence` - štirinajstdnevna pojavnost okužb
 
-5. **tblG1** - Vsebuje agregirane podatke glede na datum, tip naročnine in tip kolesa
+5. **tblG1** - Vsebuje agregirane podatke glede na datum, tip naročnine in tip kolesa:
 - `year` - leto izposoje
 - `month` - mesec izposoje
 - `season` - letni čas izposoje
@@ -96,14 +96,14 @@ Prve štiri tabele predstavljajo prečiščene podatke. Tabele poimenovane tblG*
 - `dur` - skupni čas izposoje
 - `dur_avg` - povprečni čas izposoje
 
-6. **tblG2** - Vsebuje agregirane podatke po vseh možnih relacijah med postajami
-- `start_station_id` - skupni čas izposoje
-- `end_station_id` - leto izposoje
-- `n` - mesec izposoje
-- `dur` - letni čas izposoje
-- `dur_avg` - dan v tednu izposoje
+6. **tblG2** - Vsebuje agregirane podatke po vseh možnih relacijah med postajami:
+- `start_station_id` - postaja izposoje
+- `end_station_id` - postaja vrnitve
+- `n` - število izposoj 
+- `dur` - skupni čas izposoje
+- `dur_avg` - povprečni čas izposoje
 
-7. **tblG3** - Vsebuje agregirane podatke po letu, uri vožnje in tipu naročnine
+7. **tblG3** - Vsebuje agregirane podatke po letu, uri vožnje in tipu naročnine:
 - `year` - leto izposoje
 - `hour` - ura izposoje
 - `time_of_day` - del dneva (Noč, Jutro, Popoldan, Večer)
@@ -139,9 +139,9 @@ print(graf1)
 print(graf2)
 ```
 
-Prvi graf v celoti ustreza našim pričakovanjem. Število voženj se z časom (in rastjo omrežja) povečuje in v letih, ko nastopi pandemija silovito pade, a se naslednje leto že skoraj povrne na predpandemično raven. Malce nas preseneti, da v letu 2020 upade število voženj, ki jih opravijo člani, a število voženj nečlanov naraste. Ugibamao, da so ljudje zaradi omejitev (delo od doma) kolesarili manj in se jim je zato ugodneje plačati dražjo posamezno vožnjo in privarčevati denar pri naročnini.
+Prvi graf v celoti ustreza našim pričakovanjem. Število voženj se s časom (in rastjo omrežja) povečuje in v letih, ko nastopi pandemija silovito pade, a se naslednje leto že skoraj povrne na predpandemično raven. Malce nas preseneti, da v letu 2020 upade število voženj, ki jih opravijo člani, a število voženj nečlanov naraste. Ugibamao, da so ljudje zaradi omejitev in dela od doma kolesarili manj in je builo zato ugodneje plačati dražjo posamezno vožnjo in privarčevati denar pri naročnini.
 
-Drugi graf nas že malce preseneti. Čeprav nečlani skupaj opravijo manj voženj, se v povprečju vozijo dlje časa. Zanimivo je, da se je, navkljub upadu vozenj v letih 2020 in 2021, skupni čas izposoje povečal. Ugibamo, da so ljudje raje namesto avtobusa in ostalih potniških storitev za daljše prevoze posegli po kolesu pa čeprav manjkrat. Morda so si kolo izposodili za daljše rekreacijske vožnje in ne za vsakodnevne vožnje v službo in nazaj.
+Drugi graf nas že malce preseneti. Čeprav nečlani skupaj opravijo manj voženj, se v povprečju vozijo dlje časa. Zanimivo je, da se je, navkljub upadu voženj v letih 2020 in 2021, skupni čas izposoje povečal. Ugibamo, da so ljudje namesto avtobusa in ostalih potniških storitev za daljše prevoze posegli po kolesu pa čeprav manjkrat. Morda so si kolo izposodili za daljše rekreacijske vožnje in ne za vsakodnevne vožnje v službo.
 
 ```{r}
 print(graf5)
@@ -165,7 +165,7 @@ Osredotočimo se na zadnja štiri leta. Pričakovano je povprečni čas vožnje 
 print(graf4)
 ```
 
-Poglejmo še število voženj po mesecih. Opazimo, da nam natančnješa delitev na mesece ne prinese bistveno več informativnosti kot delitev na letni čas. Opazimo tudi očiten vpliv Covid-19 v mesecu marcu in aprilu 2020. Po vzorcu prejšnjih dveh let bi moralo število voženj članov sunkovito narasti, a namesto tega pade. Po drugi strani pa število voženj nečlanov naraste bolj kot leta poprej.
+Poglejmo še število voženj po mesecih. Opazimo, da nam natančnejša delitev na mesece ne prinese bistveno več informativnosti kot delitev na letne čase. Opazimo tudi očiten vpliv Covid-19 v mesecih marcu in aprilu 2020. Po vzorcu prejšnjih dveh let bi moralo število voženj članov sunkovito narasti, a namesto tega pade. Po drugi strani pa število voženj nečlanov naraste bolj kot leta poprej.
 
 ### Pandemija
 
@@ -173,7 +173,7 @@ Poglejmo še število voženj po mesecih. Opazimo, da nam natančnješa delitev 
 print(graf7)
 ```
 
-Če na prejšnji graf vnesemo še podatke o povprečni 14 dnevni incidenca, vidimo, da se v prvem valu močno zmanjša število voženj. Poleti, ko je primrov Covida manj se tudi število voženj poveča. Pozimi ob drugem valu pa se ponovno zniža bolj kot v letih poprej. V letu 2022 je število voženj bistveno manj odvisno od števila primerov kot v letu 2021, saj se je tako odnos kot tudi pandemija sama korenito spremenila. V prvem valu je bil prisoten izrazit strah in panika pred virusom, saj je bil povsem neznan. V sledečih valovih se je ta odnos spremenil. Spremenili se je tudi sam virus kot tudi razvoj zdravljenje in preventive pred virusom (celjenje), kar je spremenilo dinamiko pandemije.
+Če na prejšnji graf vnesemo še podatke o povprečni 14 dnevni incidenci, vidimo, da se v prvem valu močno zmanjša število voženj. Poleti, ko je primerov Covida manj se tudi število voženj poveča. Pozimi ob drugem valu pa se ponovno zniža bolj kot v letih poprej. V letu 2022 je število voženj bistveno manj odvisno od števila primerov kot v letu 2021, saj se je tako odnos do pandemije kot tudi pandemija sama korenito spremenila. V prvem valu je bil prisoten izrazit strah in panika pred virusom, saj je bil povsem neznan. V nadaljnnih valovih se je ta odnos spremenil. Spremenili se je tudi sam virus kot tudi razvoj zdravljenje in preventive pred virusom (celjenje), kar je spremenilo dinamiko pandemije.
 
 ### Vreme
 
@@ -181,13 +181,13 @@ print(graf7)
 print(graf8)
 ```
 
-Graf ponovno pokaže, da je delitev glede na tip naročnine zelo pomembna, saj se različna tipa uporabnikov obnašata različno. Kot smo špekulirali že prej, člani opravijo največ voženj ravno v času jutranje in popodanske gužve, saj so najverjetneje na na poti v službo. Nečlani pa so bolj aktivni popoldne in zvečer, v času socialnih aktivnosti. Zdaj lahko z večjim prepričanjem trdimo, da je Covid-19 močneje vplival na navade člane, saj so zaradi pandemije bili prislijeni ali pa so preferirali delo od doma.
+Graf ponovno pokaže, da je delitev glede na tip naročnine zelo pomembna, saj se različna tipa uporabnikov obnašata različno. Kot smo špekulirali že prej, člani opravijo največ voženj ravno v času jutranje in popoldanske gneče, saj so najverjetneje na poti v službo. Nečlani pa so bolj aktivni popoldne in zvečer, v času socialnih aktivnosti. Zdaj lahko z večjim prepričanjem trdimo, da je Covid-19 močneje vplival na člane kot na nečlane.
 
 ```{r}
 print(graf9)
 ```
 
-Če pogledamo še vremenski vpliv, pričakovano opazimoe, da je število voženj močno povezano z temperaturo. Že prej smo opazili, da letni čas močno vpliva na število voženj zato je smisleno, da
+Če pogledamo še vremenski vpliv, pričakovano opazimo, da je število voženj močno povezano s temperaturo. Že prej smo opazili, da letni čas močno vpliva na število voženj, zato je smiselno, da
 se več voženj opravi pri višjih temperaturah, saj sta letni čas in povprečna dnevna temperatura močno povezana.
 
 ### Postaje
@@ -196,19 +196,19 @@ se več voženj opravi pri višjih temperaturah, saj sta letni čas in povprečn
 print(graf10)
 ```
 
-Poleg temperature imjo tudi ostali vremenski dejavniki nezanemarljiv vpliv. V splošnem lepše kot je vreme, več izposoj je opravljenih.
+Poleg temperature imajo tudi ostali vremenski dejavniki nezanemarljiv vpliv. V splošnem lepše, kot je vreme, več izposoj je opravljenih.
 
 ```{r}
 print(zemljevid1)
 ```
 
-Poglejmo na hitro še zemljevid omrežja postaj. Pokaže nam, da je omrežje postaj razpršeno po zelo velikem območu. Med najbolj vzhodno in najbolj zahodno postajo je kar 60 km razlike v zemljepisni širini. Med najbolj severno in južno pa skoraj 40 km razlike v zemljepisni širini
+Poglejmo na še zemljevid omrežja postaj. Pokaže nam, da je omrežje postaj razpršeno po zelo velikem območu. Med najbolj vzhodno in najbolj zahodno postajo je kar 60 km razlike v zemljepisni dolžini. Med najbolj severno in južno postajo pa skoraj 40 km razlike v zemljepisni širini.
 
 ```{r}
 print(zemljevid2)
 ```
 
-Čeprav je omrežje postaj zelo veliko, je gostota postaj seveda največja v okolici centra Washington DC.
+Čeprav je omrežje postaj zelo veliko, je gostota postaj največja v okolici centra Washington, D.C..
 
 ```{r, figures-z2, fig.show="hold", out.width="50%"}
 par(mar = c(4, 4, .1, .1))
@@ -216,7 +216,7 @@ print(zemljevid3)
 print(zemljevid4)
 ```
 
-Če se omejimo na 15 najbolj promentih postaj, se vse nahajajo v strogem centru. Opazimo, da se najbolj prometne postaje po izposoji in vrnitvi koles razlikujeta le v eni postaji. To pomeni, da je kolesarsko omrežje dobro uravnovešeno, saj so izposoje in vrnitve do neke mere simetrične.
+Petnajst najbolj promentih postaj se vse nahajajo v strogem centru. Opazimo, da se najbolj prometne postaje po izposoji in vrnitvi koles razlikujejo le v eni postaji. To pomeni, da je kolesarsko omrežje dobro uravnoteženo, saj so izposoje in vrnitve do neke mere simetrične.
 
 ***
 
@@ -233,7 +233,7 @@ Poizkusimo ugotoviti katere spremenljivke bi vključili v naš napovedni model.
 print(korelacije1)
 ```
 
-Kot smo sklepali že iz prejšnjih grafov imata tako vreme kot tudi Covid-19 vpliv na število voženj in čas voženj. Diagonalni elementi grafa nam kažejo porazdelitev spremenljivke. Ker se porazdelitve na korelaciji1 slabo vidijo za Covid-19 in za dez jih  poglejmo se v posebnem primeru, ko so > 0.
+Kot smo sklepali že iz prejšnjih grafov imata tako vreme kot tudi Covid-19 vpliv na število voženj in čas voženj. Diagonalni elementi grafa nam kažejo porazdelitev spremenljivke. Ker se porazdelitve na graf slabo vidijo za Covid-19 in za padavine jih poglejmo se v posebnem primeru, ko so večje od nič.
 
 ```{r, figures-p, fig.show="hold", out.width="50%"}
 par(mar = c(4, 4, .1, .1))
@@ -249,14 +249,15 @@ print(korelacije2)
 
 Še bolj pregleden način predstavitv korelacij, kjer ne delimo po tipu naročnine. 
 
-Sestavili bomo 6 regresijskih modelov in poizkušali napovedati število voženj v dnevu. Prvi trije modeli so zgrajeni z vgrajeno funkcijo `lm`, zadnji trije pa z pomočjo naključnih gozdov iz paketa `ranger`. 
+Sestavili bomo šest regresijskih modelov in poizkušali napovedati število voženj v dnevu. Prvi trije modeli so zgrajeni z vgrajeno funkcijo `lm`, zadnji trije pa z pomočjo naključnih gozdov iz paketa `ranger`. 
 
 * V modelih, ki imajo v imenu število 1 uporabljamo:
   + povprečno dnevno temperaturo.
 * V modelih, ki imajo v imenu število 2 uporabljamo:
-  + štirinajstdnevna pojavnost okužb
+  + povprečno dnevno temperaturo
+  + štirinajst dnevno pojavnost okužb
   + količino padavin
-  + globina snega
+  + globino snega
   + vremenski indikator za snežni vihar
 * V modelih, ki imajo v imenu število 3 uporabljamo vse spremenljivke, ki jih imamo na voljo
 
@@ -316,13 +317,13 @@ print(grafN1)
 print(grafN2)
 ```
 
-Vidimo, da če napovedujemo z iz več spremenljivk dobimo točnejši model. Zanimivo je, da je le gozd3 natanjčnejši od svojega ekvivalentnega lin3 modela, ostala dva, gozd1 in gozd2 pa nista. Tudi Rsquared
-se izboljšuje z povečevanjem števila spremenljivk. 
+Če napovedujemo iz več spremenljivk dobimo točnejši model. Zanimivo je, da je le gozd3 natanjčnejši od ekvivalentnega lin3 modela, ostala dva, gozd1 in gozd2 pa nista. Tudi Rsquared
+se izboljšuje s povečevanjem števila spremenljivk. 
 
 ***
 
 ## Zaključek
 
-Zaključimo lahko, da je število izposoj zelo povezano z vremenom in tudi z razmerjem pandemije Covid-19. Pomembno je, da poudarimo, da se najverjetneje vpliv pandemije zmanjšuje s časom, saj se tako mi kot virus prilagajamo in spreminjamo. Pripomnil bi, da je ostalo še veliko kar bi lahko z pridobljenimi podatki storil, a je ali zmanjkalo časa ali pa presega moje trenutne sposobnosti in znanje.
+Zaključimo lahko, da je število izposoj zelo povezano z vremenom in tudi z razmerjem pandemije Covid-19. Poudarimo, da se najverjetneje vpliv pandemije zmanjšuje s časom, saj se tako mi kot virus prilagajamo in spreminjamo.
 
 ***
