@@ -180,12 +180,6 @@ tblM3_testni <- tblM_testni %>%
     -dur_avg
   )
 
-# rm(
-#   tr,
-#   tblM,
-#   tblMk
-# )
-
 #  Naucimo najprej modele z linearno regresijo
 
 lin.model1a = lm(n ~ tavg_aug, data = tblM1_ucni)
@@ -211,38 +205,94 @@ ng.reg.model3 = ranger(n ~ ., tblM3_ucni)
 summary(ng.reg.model3)
 print(ng.reg.model3)
 
-#  Primerjava modelov
+#  Napovedi in primerjava modelov
 
-print('Napoved linearnega modela 1a')
+#  Napoved linearnega modela 1a
 napoved_testni_lin.model1a <- predict(lin.model1a, tblM1_testni)
-postResample(napoved_testni_lin.model1a, tblM1_testni$n)
+lin1a <- postResample(napoved_testni_lin.model1a, tblM1_testni$n)
 
-print('Napoved linearnega modela 2')
+#  Napoved linearnega modela 2
 napoved_testni_lin.model2 <- predict(lin.model2, tblM2_testni)
-postResample(napoved_testni_lin.model2, tblM2_testni$n)
+lin2 <- postResample(napoved_testni_lin.model2, tblM2_testni$n)
 
-print('Napoved linearnega modela 3')
+#  Napoved linearnega modela 3
 napoved_testni_lin.model3 <- predict(lin.model3, tblM3_testni)
-postResample(napoved_testni_lin.model3, tblM3_testni$n)
+lin3 <- postResample(napoved_testni_lin.model3, tblM3_testni$n)
 
-print('Napoved nakljucnega gozda 1')
+#  'Napoved nakljucnega gozda 1
 napoved_testni_ng.reg.model1 <- predict(ng.reg.model1 , tblM1_testni)$prediction
-postResample(napoved_testni_ng.reg.model1, tblM1_testni$n)
+gozd1 <- postResample(napoved_testni_ng.reg.model1, tblM1_testni$n)
 
-print('Napoved nakljucnega gozda 2')
+#  Napoved nakljucnega gozda 2
 napoved_testni_ng.reg.model2 <- predict(ng.reg.model2 , tblM2_testni)$prediction
-postResample(napoved_testni_ng.reg.model2, tblM2_testni$n)
+gozd2 <- postResample(napoved_testni_ng.reg.model2, tblM2_testni$n)
 
-print('Napoved nakljucnega gozda 3')
+#  Napoved nakljucnega gozda 3 
 napoved_testni_ng.reg.model3 <- predict(ng.reg.model3 , tblM3_testni)$prediction
-postResample(napoved_testni_ng.reg.model3, tblM3_testni$n)
+gozd3 <- postResample(napoved_testni_ng.reg.model3, tblM3_testni$n)
+
+#  Sestavimo tabelo napak.
+
+tblN <- bind_rows(
+  lin1a,
+  lin2,
+  lin3,
+  gozd1,
+  gozd2,
+  gozd3
+) %>%
+  add_column(
+    model = c(
+      'lin1a',
+      'lin2',
+      'lin3',
+      'gozd1',
+      'gozd2',
+      'gozd3'
+    )
+  )
+
+# #  Pomen tipa clanstva
+# lin.model1b = lm(n ~ member_type + tavg_aug + member_type * tavg_aug, data = tblM1)
+# summary(lin.model1b)
+# #  Plot linearnega modela 1b (na testnih podatkih)
+# plot(n~tavg_aug,tblM1,col=tblM$member_type,pch=20)
+# curve(predict(lin.model1b,newdata=data.frame(tavg_aug=x,member_type='casual')),col=1,add=T)
+# curve(predict(lin.model1b,newdata=data.frame(tavg_aug=x,member_type='member')),col=2,add=T)
 
 
-#  Pomen tipa clanstva
-lin.model1b = lm(n ~ member_type + tavg_aug + member_type * tavg_aug, data = tblM1)
-summary(lin.model1b)
-#  Plot linearnega modela 1b (na testnih podatkih)
-plot(n~tavg_aug,tblM1,col=tblM$member_type,pch=20)
-curve(predict(lin.model1b,newdata=data.frame(tavg_aug=x,member_type='casual')),col=1,add=T)
-curve(predict(lin.model1b,newdata=data.frame(tavg_aug=x,member_type='member')),col=2,add=T)
+rm(
+  napoved_testni_lin.model1a,
+  napoved_testni_lin.model2,
+  napoved_testni_lin.model3,
+  napoved_testni_ng.reg.model1,
+  napoved_testni_ng.reg.model2,
+  napoved_testni_ng.reg.model3,
+  lin1a,
+  lin2,
+  lin3,
+  gozd1,
+  gozd2,
+  gozd3,
+  ng.reg.model1a,
+  lin.model1a,
+  lin.model2,
+  lin.model3,
+  ng.reg.model1,
+  ng.reg.model2,
+  ng.reg.model3,
+  tr,
+  tblM_testni,
+  tblM_ucni,
+  tblM1,
+  tblM1_testni,
+  tblM1_ucni,
+  tblM2,
+  tblM2_testni,
+  tblM2_ucni,
+  tblM3_testni,
+  tblM3_ucni,
+  tblMk
+)
+
 
