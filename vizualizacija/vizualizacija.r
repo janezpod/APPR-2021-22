@@ -117,7 +117,7 @@ graf4 <- tblG1 %>%
     values = c('cornflowerblue', 'green3', 'orangered', 'orange2')
   ) +
   scale_x_discrete(
-    labels = c('JAN', 'FEB', 'MAR', 'APR', 'MAj', 'JUN', 'JU', 'AVG', 'SEP', 'OKT', 'NOV', 'DEC')
+    labels = c('JAN', 'FEB', 'MAR', 'APR', 'MAj', 'JUN', 'JUL', 'AVG', 'SEP', 'OKT', 'NOV', 'DEC')
   ) +
   labs(
     title = paste('Primerjava števila vo', '\u17e', 'enj po letihi in mesecih', sep = ''),
@@ -222,6 +222,9 @@ graf6 <- tblG1 %>%
   ) +
   theme_void()
 
+#  Nesmiselno je primerjati cas voznje z elektricnim proti navadnim, saj nevemo
+# hitrosti. Vendar je 17 % nezamerljivo velik delez.
+
 # 7. graf: Stevilo vozenj po mesecih in Covid-19
 
 graf7 <- tblG4 %>%
@@ -259,7 +262,7 @@ graf7 <- tblG4 %>%
     values = c('cornflowerblue', 'green3', 'orangered', 'orange2')
   ) +
   scale_x_discrete(
-    labels = c('JAN', 'FEB', 'MAR', 'APR', 'MAj', 'JUN', 'JU', 'AVG', 'SEP', 'OKT', 'NOV', 'DEC')
+    labels = c('JAN', 'FEB', 'MAR', 'APR', 'MAj', 'JUN', 'JUL', 'AVG', 'SEP', 'OKT', 'NOV', 'DEC')
   ) +
   labs( 
     title = paste('Število vo', '\u17e', 'enj in Covid-19', sep = ''),
@@ -280,8 +283,77 @@ graf7 <- tblG4 %>%
     axis.text.x = element_text(size= rel(0.8), angle=90)
   )
 
-#  Nesmiselno je primerjati cas voznje z elektricnim proti navadnim, saj nevemo
-# hitrosti. Vendar je 17 % nezamerljivo velik delez.
+#  8. graf: Število voženj po urah v dnevu glede na top naročnine
+
+graf8 <- tblG3 %>%
+  filter(
+    year > 2017
+  ) %>%
+  ggplot(
+  ) + 
+  geom_col(
+    aes(
+      x = factor(hour),
+      y = n,
+      fill = factor(time_of_day)
+    )
+  ) +
+  scale_fill_manual(
+    labels = c('Noč', 'Jutro', 'Popoldne', 'Večer'),
+    values = wes_palette('Zissou1', 4)
+  ) +
+  scale_x_discrete(
+    guide = guide_axis(n.dodge = 2)
+  ) +
+  labs( 
+    title = paste('Število vo', '\u17e', 'enj po urah v dnevu', sep = ''),
+    x = 'Mesec',
+    y = paste('Število vo', '\u17e', 'enj', sep = ''),
+    fill = 'Del dneva'
+  ) +
+  facet_grid(
+    col = vars(year),
+    row = vars(member_type),
+    labeller = labeller(member_type = c('casual'='Nečlan', 'member'='Član'))
+  ) +
+  theme_minimal(
+  ) + 
+  theme(
+    axis.text.x = element_text(size= rel(0.75))
+  )
+
+#  9. graf: Povprečna dnevna temperatura in število voženj
+
+graf9 <- tblG5 %>%
+  filter(
+    year > 2017
+  ) %>%
+  ggplot(
+  ) +
+  geom_smooth(
+    aes(
+      x = date,
+      y = n,
+    )
+  ) +
+  geom_line(
+    aes(
+      x = date, 
+      y = tavg * 10e2 / 3
+    ),
+    color='red',
+    size = 0.5
+  ) +
+  labs( 
+    title = paste('Število vo', '\u17e', 'enj in povpre', '\u010d', 'na dnevna temperatura', sep = ''),
+    x = 'Datum',
+    y = paste('Število vo', '\u17e', 'enj', sep = '')
+  ) +
+  scale_y_continuous(
+    sec.axis = sec_axis(~.* (10e-3 / 4), name = 'Temperatura (\u00B0C)')
+  ) +
+  theme_minimal(
+  )
 
 # 1. zemljevid: Poglejmo kje se nahajajo postaje
 
@@ -306,7 +378,7 @@ zemljevid1 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
   ) +
   labs(
     x = 'Zemljepisna dolžina',
-    y = 'zemljepisna širina'
+    y = 'Zemljepisna širina'
   ) + 
   ggtitle(
     'Lokacija postaj'
@@ -382,7 +454,7 @@ zemljevid3 <- c(left = -77.07, bottom = 38.873, right = -76.975, top = 38.925) %
     fill = 'Izposoja koles'
   ) + 
   ggtitle(
-    '15 najbolj prometnih postaj'
+    '15 najbolj prometnih postaj (izposoja)'
   ) +
   theme_bw(
   )
@@ -416,7 +488,7 @@ zemljevid4 <- c(left = -77.07, bottom = 38.873, right = -76.975, top = 38.925) %
     fill = 'Vritve koles'
   ) + 
   ggtitle(
-    '15 najbolj prometnih postaj'
+    '15 najbolj prometnih postaj (vrnitev)'
   ) +
   theme_bw(
   )

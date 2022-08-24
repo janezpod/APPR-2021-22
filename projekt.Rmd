@@ -105,7 +105,7 @@ Prve štiri tabele predstavljajo prečiščene podatke. Tabele poimenovane tblG*
 - `start_station_id` - postaja izposoje
 - `end_station_id` - postaja vrnitve
 
-7. **tblG3** - Vsebuje podatke o vsaki posamezni vožnji
+7. **tblG3** - Vsebuje agregirane podatke po letu, uri vožnje in tipu naročnine
 - `date` - datum izposoje
 - `hour` - ura izposoje
 - `time_of_day` - del dneva (Noč, Jutro, Popoldan, Večer)
@@ -127,15 +127,13 @@ Prve štiri tabele predstavljajo prečiščene podatke. Tabele poimenovane tblG*
 
 ## Analiza in vizualizacija podatkov
 
-### Vizualizacija kolesarskega omrežja
-
-Začeli bomo z analizo voženj in postaj
+Začeli bomo z analizo voženj in postaj ter pogledali vpliv Covida-19 in vremena na trende.
 
 ```{r vizualizacija, results='hide'}
 source("vizualizacija/vizualizacija.r", encoding="UTF-8")
 ```
 
-```{r, figures-a, fig.show="hold", out.width="50%"}
+```{r, figures-g1, fig.show="hold", out.width="50%"}
 par(mar = c(4, 4, .1, .1))
 print(graf1)
 print(graf2)
@@ -174,5 +172,37 @@ print(graf7)
 ```
 
 Če na prejšnji graf vnesemo še podatke o povprečni 14 dnevni incidenca, vidimo, da se v prvem valu močno zmanjša število voženj. Poleti, ko je primrov Covida manj se tudi število voženj poveča. Pozimi ob drugem valu pa se ponovno zniža bolj kot v letih poprej. V letu 2022 je število voženj bistveno manj odvisno od števila primerov kot v letu 2021, saj se je tako odnos kot tudi pandemija sama korenito spremenila.
+
+```{r}
+print(graf8)
+```
+
+Graf ponovno pokaže, da je delitev glede na tip naročnine zelo pomembna, saj se različna tipa uporabnikov obnašata različno. Člani opravijo največ voženj ravno v času jutranje in popodanske gužve, ko so ljudje na poti v službo. Nečlani pa so bolj aktivni popoldne in zvečer, v času socialnih aktivnosti. Zdaj lahko bolje utrdimo, da je Covid-19 močneje vplival na člane, saj so morda delali od doma.
+
+```{r}
+print(graf9)
+```
+
+Videle smo že, da je število voženj močno povezano z letnim časom, ki je seveda povezan z povprečno temperaturo. Jasno je, da se bo več voženj opravilo pri višjih temperaturah.
+
+```{r}
+print(zemljevid1)
+```
+
+Poglejmo na hitro še zemljevid omrežja postaj. Pokaže nam, da je omrežje postaj razpršeno po zelo velikem območu. Med najbolj vzhodno in najbolj zahodno postajo je kar 60 km razlike v zemljepisni širini. Med najbolj severno in južno pa skoraj 40 km razlike v zemljepisni širini
+
+```{r}
+print(zemljevid2)
+```
+
+Čeprav je omrežje postaj zelo veliko, je gostota postaj seveda največja v okolici centra Washington DC.
+
+```{r, figures-z2, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+print(zemljevid3)
+print(zemljevid4)
+```
+
+Če se omejimo na 15 najbolj promentih postaj, se vse nahajajo v strogem centru. Opazimo, da se najbolj prometne postaje po izposoji in vrnitvi koles razlikujeta le v eni postaji. To pomeni, da je kolesarsko omrežje dobro uravnovešeno, saj so izposoje in vrnitve do neke mere simetrične.
 
 ***

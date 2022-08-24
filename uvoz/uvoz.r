@@ -593,8 +593,9 @@ tblG2 <- tblCB %>%
 breaks <- hour(hm('00:00', '6:00', '12:00', '18:00', '23:59'))
 labels <- c(0, 1, 2, 3)
 
-#  TABELA 3: Vkljucuje datum voznje, uro začetka, čas v dnevu (noč, jutro,
-# popoldne, večer), čas vožnje, tip naročnine in tip kolesa.
+#  TABELA 3: Vkljucuje aregirane podatke po datum voznje, uro začetka,
+# čas v dnevu (noč, jutro, popoldne, večer), čas vožnje, tip naročnine in tip
+# kolesa.
 
 #                   Noč    Jutro  Podpoldne  Večer
 breaks <- hour(hm('00:00', '6:00', '12:00', '18:00', '23:59'))
@@ -605,6 +606,7 @@ tblG3 <- tblCB %>%
     -ended_at
   ) %>%
   transmute(
+    year = year(started_at),
     date = date(started_at),
     hour = hour(started_at),
     time_of_day = 
@@ -617,6 +619,17 @@ tblG3 <- tblCB %>%
     duration = duration,
     member_type = member_type,
     rideable_type = rideable_type
+  ) %>%
+  group_by(
+    year,
+    hour,
+    time_of_day,
+    member_type,
+  ) %>%
+  summarise(
+    n = n(),
+    dur = sum(duration)/ (60 * 24), # v urah
+    dur_avg = dur / n * (24) # v minutah
   )
 
 rm(breaks, labels)
