@@ -25,16 +25,29 @@ korelacije1 <- tblMk %>%
       'Temperatura',
       'Padavine'
     )
+  ) +
+  ggtitle(
+    'Korelacije in porazdelitve'
   )
   
 korelacije2 <- tblMk[1:5] %>% 
+  rename(
+    st_vozenj = n,
+    povp_cas = dur_avg,
+    pojavnost_cov = cases_incidence,
+    povp_tem = tavg_aug,
+    dez = prcp
+  ) %>%
   ggcorr(
     nbreaks = 10,
     label  = TRUE,
     size = 4,
     hjust = 0.75
+  ) +
+  ggtitle(
+    'Korelacije'
   )
-
+  
 #  Ker se porazdelitve na korelaciji1 slabo vidijo za Covid-19 in za dez jih
 # poglejmo se v posebnem primeru, ko so > 0.
 
@@ -52,8 +65,8 @@ porazdelitev1 <- tblM %>%
     fill='lightblue'
   ) +
   labs(
-    title = 'Porazdelitev primerov Covid-19',
-    x = 'Primeri Covid-19',
+    title = 'Porazdelitev primerov Covid-19, ko so večji od 0',
+    x = 'Potrjeni primeri Covid-19 na dan',
     y = 'Gostota',
   ) +
   theme_classic()
@@ -72,7 +85,7 @@ porazdelitev2 <- tblM %>%
     fill='lightblue'
   ) +
   labs(
-    title = 'Porazdelitev količine dežja',
+    title = 'Porazdelitev količine dežja, ko je večja od 0',
     x = 'Količina padavin (mm)',
     y = 'Gostota',
   ) +
@@ -167,62 +180,69 @@ tblM3_testni <- tblM_testni %>%
     -dur_avg
   )
 
-rm(
-  tr,
-  tblM,
-  tblMk
-)
+# rm(
+#   tr,
+#   tblM,
+#   tblMk
+# )
 
 #  Naucimo najprej modele z linearno regresijo
 
-lin.model_1a = lm(n ~ tavg_aug, data = tblM1_ucni)
-summary(lin.model_1a)
+lin.model1a = lm(n ~ tavg_aug, data = tblM1_ucni)
+summary(lin.model1a)
 
-lin.model_2 = lm(n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, data = tblM2_ucni)
-summary(lin.model_2)
+lin.model2 = lm(n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, data = tblM2_ucni)
+summary(lin.model2)
 
-lin.model_3 = lm(n ~ ., data = tblM3_ucni)
-summary(lin.model_3)
+lin.model3 = lm(n ~ ., data = tblM3_ucni)
+summary(lin.model3)
 
 #  Pa se z nakljucnimi gozdovi
 
-ng.reg.model_1 = ranger(n ~ tavg_aug, tblM1_ucni)
-summary(ng.reg.model_1)
-print(ng.reg.model_1)
+ng.reg.model1 = ranger(n ~ tavg_aug, tblM1_ucni)
+summary(ng.reg.model1)
+print(ng.reg.model1)
 
-ng.reg.model_2 = ranger(n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, tblM2_ucni)
-summary(ng.reg.model_2)
-print(ng.reg.model_2)
+ng.reg.model2 = ranger(n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, tblM2_ucni)
+summary(ng.reg.model2)
+print(ng.reg.model2)
 
-ng.reg.model_3 = ranger(n ~ ., tblM3_ucni)
-summary(ng.reg.model_3)
-print(ng.reg.model_3)
+ng.reg.model3 = ranger(n ~ ., tblM3_ucni)
+summary(ng.reg.model3)
+print(ng.reg.model3)
 
 #  Primerjava modelov
 
 print('Napoved linearnega modela 1a')
-napoved_testni_lin.model_1a <-predict(lin.model_1a, tblM1_testni)
-postResample(napoved_testni_lin.model_1a, tblM1_testni$n)
+napoved_testni_lin.model1a <- predict(lin.model1a, tblM1_testni)
+postResample(napoved_testni_lin.model1a, tblM1_testni$n)
 
 print('Napoved linearnega modela 2')
-napoved_testni_lin.model_2 <-predict(lin.model_2, tblM2_testni)
-postResample(napoved_testni_lin.model_2, tblM2_testni$n)
+napoved_testni_lin.model2 <- predict(lin.model2, tblM2_testni)
+postResample(napoved_testni_lin.model2, tblM2_testni$n)
 
 print('Napoved linearnega modela 3')
-napoved_testni_lin.model_3 <-predict(lin.model_3, tblM3_testni)
-postResample(napoved_testni_lin.model_3, tblM3_testni$n)
+napoved_testni_lin.model3 <- predict(lin.model3, tblM3_testni)
+postResample(napoved_testni_lin.model3, tblM3_testni$n)
 
 print('Napoved nakljucnega gozda 1')
-napoved_testni_ng.reg.model_1 <-predict(ng.reg.model_1 , tblM1_testni)$prediction
-postResample(napoved_testni_ng.reg.model_1, tblM1_testni$n)
-
+napoved_testni_ng.reg.model1 <- predict(ng.reg.model1 , tblM1_testni)$prediction
+postResample(napoved_testni_ng.reg.model1, tblM1_testni$n)
 
 print('Napoved nakljucnega gozda 2')
-napoved_testni_ng.reg.model_2 <-predict(ng.reg.model_2 , tblM2_testni)$prediction
-postResample(napoved_testni_ng.reg.model_2, tblM2_testni$n)
+napoved_testni_ng.reg.model2 <- predict(ng.reg.model2 , tblM2_testni)$prediction
+postResample(napoved_testni_ng.reg.model2, tblM2_testni$n)
 
 print('Napoved nakljucnega gozda 3')
-napoved_testni_ng.reg.model_3 <-predict(ng.reg.model_3 , tblM3_testni)$prediction
-postResample(napoved_testni_ng.reg.model_3, tblM3_testni$n)
+napoved_testni_ng.reg.model3 <- predict(ng.reg.model3 , tblM3_testni)$prediction
+postResample(napoved_testni_ng.reg.model3, tblM3_testni$n)
 
+
+#  Pomen tipa clanstva
+lin.model1b = lm(n ~ member_type + tavg_aug + member_type * tavg_aug, data = tblM1)
+summary(lin.model1b)
+#  Plot linearnega modela 1b (na testnih podatkih)
+plot(n~tavg_aug,tblM1,col=tblM$member_type,pch=20)
+curve(predict(lin.model1b,newdata=data.frame(tavg_aug=x,member_type='casual')),col=1,add=T)
+curve(predict(lin.model1b,newdata=data.frame(tavg_aug=x,member_type='member')),col=2,add=T)
 
