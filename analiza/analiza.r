@@ -250,6 +250,9 @@ tblN <- bind_rows(
       'gozd2',
       'gozd3'
     )
+  ) %>%
+  relocate(
+    model
   )
 
 # #  Pomen tipa clanstva
@@ -262,25 +265,6 @@ tblN <- bind_rows(
 
 
 rm(
-  napoved_testni_lin.model1a,
-  napoved_testni_lin.model2,
-  napoved_testni_lin.model3,
-  napoved_testni_ng.reg.model1,
-  napoved_testni_ng.reg.model2,
-  napoved_testni_ng.reg.model3,
-  lin1a,
-  lin2,
-  lin3,
-  gozd1,
-  gozd2,
-  gozd3,
-  ng.reg.model1a,
-  lin.model1a,
-  lin.model2,
-  lin.model3,
-  ng.reg.model1,
-  ng.reg.model2,
-  ng.reg.model3,
   tr,
   tblM_testni,
   tblM_ucni,
@@ -295,4 +279,47 @@ rm(
   tblMk
 )
 
+grafN1 <- tblN %>%
+  pivot_longer(
+    .,
+    cols = c(RMSE, MAE),
+    names_to = 'mesure_type',
+    values_to = 'mesure'
+  ) %>%
+  ggplot(
+  ) + 
+  geom_col(
+    aes(
+      x = mesure_type,
+      y = mesure
+    )
+  ) +
+  facet_grid(
+    cols = vars(model)
+  ) +
+  labs( 
+    title = 'Primerjava napak Root-mean-square deviation (RMSE) in Mean absolute error (MAE)',
+    x = 'Tip napake',
+    y = ''
+  ) +
+  theme_minimal()
 
+grafN2 <- tblN %>%
+  ggplot(
+  ) + 
+  geom_col(
+    aes(
+      x = model,
+      y = Rsquared
+    )
+  ) +
+  ylim(
+    0,
+    1
+  ) +
+  labs( 
+    title = 'Primerjava napak Coefficient of determination (Rsquared)',
+    x = 'Model',
+    y = 'Rsquared'
+  ) +
+  theme_minimal()

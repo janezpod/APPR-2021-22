@@ -1,6 +1,6 @@
 #2. faza: Uvoz podatkov
 
-source('lib/funkcije.r', encoding='UTF-8')
+# source('lib/funkcije.r', encoding='UTF-8')
 sl <- locale("sl", decimal_mark=",", grouping_mark=".")
 
 #  POZOR: Prenos traja kar nekaj casa, saj so podatki o kolesarskih vožnjah

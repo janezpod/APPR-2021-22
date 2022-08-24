@@ -68,8 +68,8 @@ Prve štiri tabele predstavljajo prečiščene podatke. Tabele poimenovane tblG*
 3. **noaa** - Prečiščeni in obdelani vremenski podatki
 - `date` - dan meritve
 - `awnd` - povprečna hitrost vetra
-- `prcp` - padavine
-- `snow` - sneženje
+- `prcp` - količina padavin
+- `snow` - količina snega
 - `snwd` - globina snega
 - `tavg` - povprečna temperatura
 - `tmax` - najvišja temperatura
@@ -247,6 +247,82 @@ Iz dolgega repa porazdelitev vidimo, da je nekaj ekstremnih primerov, ko je šte
 print(korelacije2)
 ```
 
-Še bolj pregleden način predstavitv korelacij, kjer ne delimo po tipu naročnine.
+Še bolj pregleden način predstavitv korelacij, kjer ne delimo po tipu naročnine. 
+
+Sestavili bomo 6 regresijskih modelov in poizkušali napovedati število voženj v dnevu. Prvi trije modeli so zgrajeni z vgrajeno funkcijo `lm`, zadnji trije pa z pomočjo naključnih gozdov iz paketa `ranger`. 
+
+* V modelih, ki imajo v imenu število 1 uporabljamo:
+  + povprečno dnevno temperaturo.
+* V modelih, ki imajo v imenu število 2 uporabljamo:
+  + štirinajstdnevna pojavnost okužb
+  + količino padavin
+  + globina snega
+  + vremenski indikator za snežni vihar
+* V modelih, ki imajo v imenu število 3 uporabljamo vse spremenljivke, ki jih imamo na voljo
+
+### 1. napovedni model
+
+```{r}
+lin.model1a = lm(n ~ tavg_aug, data = tblM1_ucni)
+summary(lin.model1a)
+```
+
+### 2. napovedni model
+
+```{r}
+lin.model2 = lm(n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, data = tblM2_ucni)
+summary(lin.model2)
+```
+
+### 3. napovedni model
+
+```{r}
+lin.model3 = lm(n ~ ., data = tblM3_ucni)
+summary(lin.model3)
+```
+
+### 4. napovedni model
+
+```{r}
+ng.reg.model1 = ranger(n ~ tavg_aug, tblM1_ucni)
+print(ng.reg.model1)
+```
+
+### 5. napovedni model
+
+```{r}
+ng.reg.model2 = ranger(n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, tblM2_ucni)
+print(ng.reg.model2)
+```
+
+### 6. napovedni model
+
+```{r}
+ng.reg.model3 = ranger(n ~ ., tblM3_ucni)
+print(ng.reg.model3)
+```
+
+Poglejmo sedaj napake modelov.
+
+```{r}
+print(tblN)
+```
+
+Izračunan napake imamo v obliki [Root-mean-square error (RMSE)](https://en.wikipedia.org/wiki/Root-mean-square_deviation), [Coefficient of determination (Rsquared)](https://en.wikipedia.org/wiki/Coefficient_of_determination) in [Mean absolute error (MAE)](https://en.wikipedia.org/wiki/Mean_absolute_error). Da bomo lažje videli napake narišemo graf.
+
+```{r, figures-n, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+print(grafN1)
+print(grafN2)
+```
+
+Vidimo, da če napovedujemo z iz več spremenljivk dobimo točnejši model. Zanimivo je, da je le gozd3 natanjčnejši od svojega ekvivalentnega lin3 modela, ostala dva, gozd1 in gozd2 pa nista. Tudi Rsquared
+se izboljšuje z povečevanjem števila spremenljivk. 
+
+***
+
+## Zaključek
+
+Zaključimo lahko, da je število izposoj zelo povezano z vremenom in tudi z razmerjem pandemije Covid-19. Pomembno je, da poudarimo, da se najverjetneje vpliv pandemije zmanjšuje s časom, saj se tako mi kot virus prilagajamo in spreminjamo. Pripomnil bi, da je ostalo še veliko kar bi lahko z pridobljenimi podatki storil, a je ali zmanjkalo časa ali pa presega moje trenutne sposobnosti in znanje.
 
 ***
