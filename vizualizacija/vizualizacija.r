@@ -12,7 +12,10 @@ graf1 <- tblG1 %>%
   ) +
   geom_col() +
   scale_fill_manual(
-    labels = c('Nečlan', 'Član'),
+    labels = c(
+      paste('Ne', '\u010d', 'lan' , sep = ''),
+      paste('\u010c', 'lan', sep = '')
+      ),
     values = wes_palette('Zissou1', 2)
   ) +
   labs(
@@ -34,7 +37,10 @@ graf2 <- tblG1 %>%
   ) +
   geom_col() +
   scale_fill_manual(
-    labels = c('Nečlan', 'Član'),
+    labels = c(
+      paste('Ne', '\u010d', 'lan' , sep = ''),
+      paste('\u010c', 'lan', sep = '')
+    ),
     values = wes_palette('Zissou1', 2)
   ) +
   labs(
@@ -194,7 +200,10 @@ graf6 <- tblG1 %>%
     position = position_stack(vjust = 0.5)
   ) +
   scale_fill_manual(
-    labels = c('Navadno kolo', 'Električno kolo'),
+    labels = c(
+      'Navadno kolo',
+      paste('Elektri', '\u010d', 'no kolo', sep = '')
+               ),
     values = wes_palette('GrandBudapest1', 2)
   ) +
   labs(
@@ -202,6 +211,57 @@ graf6 <- tblG1 %>%
     fill = 'Tip kolesa'
   ) +
   theme_void()
+
+# 7. graf: Stevilo vozenj po mesecih in Covid-19
+
+graf7 <- tblG4 %>%
+  filter(
+    year > 2017
+  ) %>%
+  group_by(
+    year,
+    month,
+    season,
+  ) %>%
+  summarise(
+    n = sum(n),
+    cases_incidence_avg = mean(cases_incidence)
+  ) %>%
+  ggplot(
+  ) +
+  geom_col(
+    aes(
+      x = factor(month),
+      y = n,
+      fill = factor(season)
+    )
+  ) + 
+  geom_line(
+    aes(
+      x = month, 
+      y = cases_incidence_avg * 300
+    ),
+    color='black',
+    size = 1
+  ) +
+  scale_fill_manual(
+    labels = c('Zima', 'Pomlad', 'Poletje', 'Jesen'),
+    values = c('cornflowerblue', 'green3', 'orangered', 'orange2')
+  ) +
+  labs( 
+    title = paste('Število vo', '\u17e', 'enj in Covid-19', sep = ''),
+    x = 'Mesec',
+    y = paste('Število vo', '\u17e', 'enj', sep = ''),
+    fill = paste('Letni ', '\u010d', 'as', sep  = '')
+  ) +
+  facet_grid(
+    col = vars(year),
+    labeller = labeller(member_type = c('casual'='Nečlan', 'member'='Član'))
+  ) +
+  scale_y_continuous(
+    sec.axis = sec_axis(~.*10e-3 / 3, name = 'Povprečna mesečna 14 incidenca')
+  ) +
+  theme_minimal()
 
 #  Nesmiselno je primerjati cas voznje z elektricnim proti navadnim, saj nevemo
 # hitrosti. Vendar je 17 % nezamerljivo velik delez.
@@ -266,7 +326,7 @@ zemljevid2 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
   ) +
   labs(
     x = 'Zemljepisna dolžina',
-    y = 'zemljepisna širina'
+    y = 'Zemljepisna širina'
   ) + 
   ggtitle(
     'Gostota postaj'
@@ -301,7 +361,7 @@ zemljevid3 <- c(left = -77.07, bottom = 38.873, right = -76.975, top = 38.925) %
   ) +
   labs(
     x = 'Zemljepisna dolžina',
-    y = 'zemljepisna širina',
+    y = 'Zemljepisna širina',
     fill = 'Izposoja koles'
   ) + 
   ggtitle(
@@ -335,7 +395,7 @@ zemljevid4 <- c(left = -77.07, bottom = 38.873, right = -76.975, top = 38.925) %
   
   labs(
     x = 'Zemljepisna dolžina',
-    y = 'zemljepisna širina',
+    y = 'Zemljepisna širina',
     fill = 'Vritve koles'
   ) + 
   ggtitle(
