@@ -324,33 +324,32 @@ se izboljšuje s povečevanjem števila spremenljivk.
 
 Ocenimo še napovedano napako s prečnim preverjanjem.
 
-
-##### lin.model1a
+#### lin.model1a
 ```{r}
 print(precno.preverjanje(tblM1_ucni, pp_tblM1_ucni, n ~ tavg_aug, 'lin.reg', FALSE))
 ```
 
-##### lin.model2
+#### lin.model2
 ```{r}
 print(precno.preverjanje(tblM2_ucni, pp_tblM2_ucni, n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, 'lin.reg', FALSE))
 ```
 
-##### lin.model3
+#### lin.model3
 ```{r}
 print(precno.preverjanje(tblM3_ucni, pp_tblM3_ucni, n ~ ., 'lin.reg', FALSE))
 ```
 
-##### ng.reg.model1
+#### ng.reg.model1
 ```{r}
 print(precno.preverjanje(tblM1_ucni, pp_tblM1_ucni, n ~ tavg_aug, 'ng', FALSE))
 ```
 
-##### ng.reg.model2
+#### ng.reg.model2
 ```{r}
 print(precno.preverjanje(tblM2_ucni, pp_tblM2_ucni, n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, 'ng', FALSE))
 ```
 
-##### ng.reg.model3
+#### ng.reg.model3
 ```{r}
 print(precno.preverjanje(tblM3_ucni, pp_tblM3_ucni, n ~ ., 'ng', FALSE))
 ```
