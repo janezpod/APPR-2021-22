@@ -261,42 +261,42 @@ Sestavili bomo šest regresijskih modelov in poizkušali napovedati število vo�
   + vremenski indikator za snežni vihar
 * V modelih, ki imajo v imenu število 3 uporabljamo vse spremenljivke, ki jih imamo na voljo
 
-### 1. napovedni model: lin.model1a
+### 1. napovedni model
 
 ```{r}
 lin.model1a = lm(n ~ tavg_aug, data = tblM1_ucni)
 summary(lin.model1a)
 ```
 
-### 2. napovedni model: lin.model2
+### 2. napovedni model
 
 ```{r}
 lin.model2 = lm(n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, data = tblM2_ucni)
 summary(lin.model2)
 ```
 
-### 3. napovedni model: lin.model3
+### 3. napovedni model
 
 ```{r}
 lin.model3 = lm(n ~ ., data = tblM3_ucni)
 summary(lin.model3)
 ```
 
-### 4. napovedni model ng.reg.model1
+### 4. napovedni model
 
 ```{r}
 ng.reg.model1 = ranger(n ~ tavg_aug, tblM1_ucni)
 print(ng.reg.model1)
 ```
 
-### 5. napovedni model: ng.reg.model2
+### 5. napovedni model
 
 ```{r}
 ng.reg.model2 = ranger(n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, tblM2_ucni)
 print(ng.reg.model2)
 ```
 
-### 6. napovedni model: ng.reg.model3
+### 6. napovedni model
 
 ```{r}
 ng.reg.model3 = ranger(n ~ ., tblM3_ucni)
@@ -319,43 +319,6 @@ print(grafN2)
 
 Če napovedujemo iz več spremenljivk dobimo točnejši model. Zanimivo je, da je le gozd3 natanjčnejši od ekvivalentnega lin3 modela, ostala dva, gozd1 in gozd2 pa nista. Tudi Rsquared
 se izboljšuje s povečevanjem števila spremenljivk. 
-
-### Prečno preverjanje
-
-Ocenimo še napovedano napako s prečnim preverjanjem.
-
-
-##### lin.model1a
-```{r}
-print(precno.preverjanje(tblM1_ucni, pp_tblM1_ucni, n ~ tavg_aug, 'lin.reg', FALSE))
-```
-
-##### lin.model2
-```{r}
-print(precno.preverjanje(tblM2_ucni, pp_tblM2_ucni, n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, 'lin.reg', FALSE))
-```
-
-##### lin.model3
-```{r}
-print(precno.preverjanje(tblM3_ucni, pp_tblM3_ucni, n ~ ., 'lin.reg', FALSE))
-```
-
-##### ng.reg.model1
-```{r}
-print(precno.preverjanje(tblM1_ucni, pp_tblM1_ucni, n ~ tavg_aug, 'ng', FALSE))
-```
-
-##### ng.reg.model2
-```{r}
-print(precno.preverjanje(tblM2_ucni, pp_tblM2_ucni, n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, 'ng', FALSE))
-```
-
-##### ng.reg.model3
-```{r}
-print(precno.preverjanje(tblM3_ucni, pp_tblM3_ucni, n ~ ., 'ng', FALSE))
-```
-
-Vidimo, da se napaka z dodajanjem napovednih spremenljivk zmanjšuje in da so naključni gozdovi natančnejši od linearnih modelov.
 
 ***
 

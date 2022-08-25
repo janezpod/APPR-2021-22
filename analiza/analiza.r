@@ -182,32 +182,26 @@ tblM3_testni <- tblM_testni %>%
 
 #  Naucimo najprej modele z linearno regresijo
 
-lin.model1a <- tblM1_ucni %>%
-  ucenje(n ~ tavg_aug, 'lin.reg')
+lin.model1a = lm(n ~ tavg_aug, data = tblM1_ucni)
 summary(lin.model1a)
 
-lin.model2 <-  tblM2_ucni %>%
-  ucenje(n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, 'lin.reg')
+lin.model2 = lm(n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, data = tblM2_ucni)
 summary(lin.model2)
 
-lin.model3 <- tblM3_ucni %>%
-  ucenje(n ~ ., 'lin.reg')
+lin.model3 = lm(n ~ ., data = tblM3_ucni)
 summary(lin.model3)
 
 #  Pa se z nakljucnimi gozdovi
 
-ng.reg.model1 <- tblM1_ucni %>%
-  ucenje(n ~ tavg_aug, 'ng')
+ng.reg.model1 = ranger(n ~ tavg_aug, tblM1_ucni)
 summary(ng.reg.model1)
 print(ng.reg.model1)
 
-ng.reg.model2 <-  tblM2_ucni %>%
-  ucenje(n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, 'ng')
+ng.reg.model2 = ranger(n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, tblM2_ucni)
 summary(ng.reg.model2)
 print(ng.reg.model2)
 
-ng.reg.model3 <- tblM3_ucni %>%
-  ucenje(n ~ ., 'ng')
+ng.reg.model3 = ranger(n ~ ., tblM3_ucni)
 summary(ng.reg.model3)
 print(ng.reg.model3)
 
@@ -227,15 +221,15 @@ lin3 <- postResample(napoved_testni_lin.model3, tblM3_testni$n)
 
 #  'Napoved nakljucnega gozda 1
 napoved_testni_ng.reg.model1 <- predict(ng.reg.model1 , tblM1_testni)$prediction
-ng1 <- postResample(napoved_testni_ng.reg.model1, tblM1_testni$n)
+gozd1 <- postResample(napoved_testni_ng.reg.model1, tblM1_testni$n)
 
 #  Napoved nakljucnega gozda 2
 napoved_testni_ng.reg.model2 <- predict(ng.reg.model2 , tblM2_testni)$prediction
-ng2 <- postResample(napoved_testni_ng.reg.model2, tblM2_testni$n)
+gozd2 <- postResample(napoved_testni_ng.reg.model2, tblM2_testni$n)
 
 #  Napoved nakljucnega gozda 3 
 napoved_testni_ng.reg.model3 <- predict(ng.reg.model3 , tblM3_testni)$prediction
-ng3 <- postResample(napoved_testni_ng.reg.model3, tblM3_testni$n)
+gozd3 <- postResample(napoved_testni_ng.reg.model3, tblM3_testni$n)
 
 #  Sestavimo tabelo napak.
 
@@ -243,18 +237,18 @@ tblN <- bind_rows(
   lin1a,
   lin2,
   lin3,
-  ng1,
-  ng2,
-  ng3
+  gozd1,
+  gozd2,
+  gozd3
 ) %>%
   add_column(
     model = c(
       'lin1a',
       'lin2',
       'lin3',
-      'ng1',
-      'ng2',
-      'ng3'
+      'gozd1',
+      'gozd2',
+      'gozd3'
     )
   ) %>%
   relocate(
@@ -313,20 +307,3 @@ grafN2 <- tblN %>%
     y = 'Rsquared'
   ) +
   theme_minimal()
-
-#  Precno preverjanje
-
-tblM1_ucni_i <- indikator.nd(tblM1_ucni)
-tblM2_ucni_i <- indikator.nd(tblM2_ucni)
-tblM3_ucni_i <- indikator.nd(tblM3_ucni)
-pp_tblM1_ucni <- pp.razbitje(tblM1_ucni_i, stratifikacija = tblM1_ucni_i$nd)
-pp_tblM2_ucni <- pp.razbitje(tblM2_ucni_i, stratifikacija = tblM2_ucni_i$nd)
-pp_tblM3_ucni <- pp.razbitje(tblM3_ucni_i, stratifikacija = tblM3_ucni_i$nd)
-
-print(precno.preverjanje(tblM1_ucni, pp_tblM1_ucni, n ~ tavg_aug, 'lin.reg', FALSE))
-print(precno.preverjanje(tblM2_ucni, pp_tblM2_ucni, n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, 'lin.reg', FALSE))
-print(precno.preverjanje(tblM3_ucni, pp_tblM3_ucni, n ~ ., 'lin.reg', FALSE))
-
-print(precno.preverjanje(tblM1_ucni, pp_tblM1_ucni, n ~ tavg_aug, 'ng', FALSE))
-print(precno.preverjanje(tblM2_ucni, pp_tblM2_ucni, n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, 'ng', FALSE))
-print(precno.preverjanje(tblM3_ucni, pp_tblM3_ucni, n ~ ., 'ng', FALSE))
