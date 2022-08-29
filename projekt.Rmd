@@ -123,6 +123,16 @@ Prve štiri tabele predstavljajo prečiščene podatke. Tabele poimenovane tblG*
 
 12. **tblM** - Združitev tabel tblG1, tblCV in noaa
 
+13. **noaaM** - Tabela izbranih vremenskih kazalcev za leto 2018:
+- `date` - dan meritve
+- `awnd` - povprečna hitrost vetra
+- `prcp` - količina dežja
+- `snow` - količina snega
+- `snwd` - globina snega
+- `tavg` - povprečna temperatura
+- `tmax` - najvišja temperatura
+- `tmin` - najnižnja temperatura
+
 ***
 
 ## Analiza in vizualizacija podatkov
@@ -220,7 +230,7 @@ Petnajst najbolj promentih postaj se vse nahajajo v strogem centru. Opazimo, da 
 
 ***
 
-## Napredna analiza podatkov
+## Napovedni model in prečno preverjanje
 
 ```{r analiza, results='hide', include = FALSE}
 source("analiza/analiza.r", encoding="UTF-8")
@@ -355,6 +365,77 @@ print(precno.preverjanje(tblM3_ucni, pp_tblM3_ucni, n ~ ., 'ng', FALSE))
 ```
 
 Vidimo, da se napaka z dodajanjem napovednih spremenljivk zmanjšuje in da so naključni gozdovi natančnejši od linearnih modelov.
+
+***
+
+## Razvrščanje v skupine
+
+Poizkušimo razdeliti vreme v letu 2018 v skupine. Želimo si štiri skupine, ki bi v grobem ustrezale letnim časom. S pomočjo hierhičnega razvrščanja in metode k-tih voditeljev bomo poiskali optimalno število razbitja množice.
+
+Najprej si poglejmo dendrogram.
+
+```{r}
+plot(
+  dendrogram,
+  labels = FALSE,
+  ylab = 'višina',
+  main = NULL
+)
+```
+
+Zanima nas kako se spreminja razdalja med skupinami v vsakem koraku združevanja, zato si poglejmo sledeči graf.
+
+```{r}
+print(dendrogram1)
+```
+
+Poglejmo si isti dendrogram malo pobližje.
+
+```{r}
+print(dendrogram2)
+```
+
+Zdaj vidimi, da so največje razlike ravno v skupinah 2,3 in 4.
+
+### Hierarhično razvrščanje v skupine
+
+Najprej si poglejmo diagram za izbiro optimalnega k z algoritomom hierhičnega razvrščanja
+
+```{r}
+print(diagram1hc)
+```
+
+Če si diagram pogledamo pobližje vidimo, da je pri k = 3 izrazit padec.
+
+```{r}
+print(diagram2hc)
+```
+
+### Metoda k-tih voditeljev
+
+Poglejmo si sedaj optimalni k, ki ga dobimo z metodo k-tih voditeljev.
+
+```{r}
+print(diagram1mk)
+```
+
+Poglejmo si ga pobližje.
+
+```{r}
+print(diagram2mk)
+```
+
+Ponovno je optimalni k = 3.
+
+### Vizualizacija razbitja
+
+Ker imajo naši podatki več kot dve rasežnosti smo jih prisiljeni preslikati v dvorasežni prostor. Pri tem seveda poskrbimo, da se razdalje med njimi kar se da ohranijo.
+
+```{r}
+print(skupineG2)
+```
+
+Naše razbitje nam ne poda dodatnega vpogleda v vremenske razmere v letu 2018. Brez dodatne analize nevemo kakšno vreme posamezne množice predstavljajo, vendar vidimo, da večina dnevov sledi premici, veliko manj pa jih je raztreščenih naokoli. Sklepamo, da je množica 2 množica izrednih vremenskih pojavov.
 
 ***
 

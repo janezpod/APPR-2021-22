@@ -22,6 +22,12 @@ library(GGally)
 library(ranger)
 library(caret)
 library(funModeling)
+library(sp)
+library(rgdal)
+library(raster)
+library(rgeos)
+library(ggalt)
+library(cluster)
 
 options(gsubfn.engine="R")
 

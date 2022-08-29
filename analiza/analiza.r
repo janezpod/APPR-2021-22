@@ -5,7 +5,7 @@
 tblMk <- tblM %>%
   ungroup(
   ) %>%
-  select(
+  dplyr::select(
     n,
     dur_avg,
     cases_incidence,
@@ -94,7 +94,7 @@ porazdelitev2 <- tblM %>%
 tblM2 <- tblM %>%
   ungroup(
   ) %>% 
-  select(
+  dplyr::select(
     n,
     member_type,
     tavg_aug,
@@ -102,7 +102,7 @@ tblM2 <- tblM %>%
     )
 
 tblM1 <- tblM2 %>% 
-  select(
+  dplyr::select(
     -cases_incidence
   )
 
@@ -121,21 +121,21 @@ tblM_testni <- tblM[-tr, ]
 tblM1_ucni <- tblM_ucni %>%
   ungroup(
     ) %>% 
-  select(n,
+  dplyr::select(n,
          tavg_aug
   )
 
 tblM1_testni <- tblM_testni %>% 
   ungroup(
   ) %>% 
-  select(n,
+  dplyr::select(n,
          tavg_aug
   )
 
 tblM2_ucni <- tblM_ucni %>% 
   ungroup(
   ) %>%
-  select(n,
+  dplyr::select(n,
          tavg_aug,
          cases_incidence,
          prcp, 
@@ -146,7 +146,7 @@ tblM2_ucni <- tblM_ucni %>%
 tblM2_testni <- tblM_testni %>%
   ungroup(
   ) %>% 
-  select(n,
+  dplyr::select(n,
          tavg_aug, 
          cases_incidence,
          prcp,
@@ -157,7 +157,7 @@ tblM2_testni <- tblM_testni %>%
 tblM3_ucni <- tblM_ucni %>% 
   ungroup(
   ) %>% 
-  select(
+  dplyr::select(
     -year,
     -season,
     -day, 
@@ -170,7 +170,7 @@ tblM3_ucni <- tblM_ucni %>%
 tblM3_testni <- tblM_testni %>%
   ungroup(
   ) %>% 
-  select(
+  dplyr::select(
     -year, 
     -season,
     -day, 
@@ -330,3 +330,94 @@ print(precno.preverjanje(tblM3_ucni, pp_tblM3_ucni, n ~ ., 'lin.reg', FALSE))
 print(precno.preverjanje(tblM1_ucni, pp_tblM1_ucni, n ~ tavg_aug, 'ng', FALSE))
 print(precno.preverjanje(tblM2_ucni, pp_tblM2_ucni, n ~ tavg_aug + cases_incidence + prcp + snwd + wt09, 'ng', FALSE))
 print(precno.preverjanje(tblM3_ucni, pp_tblM3_ucni, n ~ ., 'ng', FALSE))
+
+
+#  1. Hierarhično razvrščanje v skupine
+
+#  Dendrogram vremenskih podatkov
+
+razdalje <- noaaM[,-1] %>%
+  dist()
+
+dendrogram <- razdalje %>%
+  hclust(method = 'ward.D')
+
+plot(
+  dendrogram,
+  labels = FALSE,
+  ylab = 'višina',
+  main = NULL
+)
+
+#  Tabela kolen dendrograma
+r = hc.kolena(dendrogram)
+
+dendrogram1  <- diagram.kolena(r) +
+  scale_x_discrete(
+    breaks = seq(0, 364, 30)
+  )
+
+dendrogram2  <- diagram.kolena(r[1:60,]) +
+  scale_x_discrete(
+    breaks = seq(0, 60, 2)
+  )
+
+#  2. Metoda k-tih voditeljev
+
+tblM.hc <- noaaM[,-1] %>%
+  obrisi(hc = TRUE)
+
+diagram1hc <- tblM.hc %>%
+  diagram.obrisi() +
+  scale_x_discrete(
+    breaks = seq(0, 364, 30)
+  )
+
+diagram2hc <- tblM.hc %>%
+  filter(
+    k <= 30
+  ) %>%
+  diagram.obrisi()
+
+tblM.km <- noaaM[,-1] %>%
+  obrisi(hc = FALSE)
+
+diagram1mk <- tblM.km %>%
+  diagram.obrisi() +
+  scale_x_discrete(
+    breaks = seq(0, 364, 30)
+  )
+
+diagram2mk <- tblM.km %>%
+  filter(
+    k <= 30
+  ) %>%
+  diagram.obrisi()
+
+datumi <- noaaM[, 1]
+
+noaaXY <- 
+  as_tibble(razdalje %>% cmdscale(k = 2)) %>%
+  bind_cols(datumi) %>%
+  dplyr::select(datumi = date, x = V1, y = V2)
+
+k1 = obrisi.k(tblM.km)
+
+skupine1 = noaaM[, -1] %>%
+  dist() %>%
+  hclust(method = "ward.D") %>%
+  cutree(k = k1) %>%
+  as.ordered()
+
+k2 = obrisi.k(tblM.hc)
+
+skupine2 = noaaM[, -1] %>%
+  dist() %>%
+  hclust(method = "ward.D") %>%
+  cutree(k = k2) %>%
+  as.ordered()
+
+
+skupineG1 <- diagram.skupine(noaaXY, noaaXY$datumi, skupine1, k1)
+
+skupineG2 <- diagram.skupine(noaaXY, noaaXY$datumi, skupine2, k2)

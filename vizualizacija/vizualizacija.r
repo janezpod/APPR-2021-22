@@ -191,7 +191,7 @@ graf6 <- tblG1 %>%
     all = sum(n),
     p = round((n / all) * 100)
   ) %>%
-  select(
+  dplyr::select(
     rideable_type,
     p
   ) %>%
@@ -360,7 +360,7 @@ graf9 <- tblG5 %>%
 graf10 <- tblG5 %>%
   ungroup(
   ) %>%
-  select(
+  dplyr::select(
     n,
     dur_avg,
     member_type,

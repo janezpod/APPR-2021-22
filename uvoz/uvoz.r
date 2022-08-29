@@ -574,7 +574,7 @@ tblG1 <- tblCB %>%
 # in z povprečnim časom vožnje na relaciji
 
 tblG2 <- tblCB %>%
-  select(
+  dplyr::select(
     duration,
     start_station_id,
     end_station_id
@@ -588,10 +588,6 @@ tblG2 <- tblCB %>%
     dur = sum(duration)/ (60 * 24), # v urah
     dur_avg = dur / n * (24) # v minutah
   )
-  
-#                   Noč    Jutro  Podpoldne  Večer
-breaks <- hour(hm('00:00', '6:00', '12:00', '18:00', '23:59'))
-labels <- c(0, 1, 2, 3)
 
 #  TABELA 3: Vkljucuje aregirane podatke po datum voznje, uro začetka,
 # čas v dnevu (noč, jutro, popoldne, večer), čas vožnje, tip naročnine in tip
@@ -728,8 +724,23 @@ tblM <- left_join(
       tavg_month
     )
   ) %>%
-  select(
+  dplyr::select(
     -tavg,
     -tavg_month
   )
   
+#  TABELA 9: Tabela izbranih vremenskih kazalcev za leto 2018 
+
+noaaM <- noaa[2558:2922,] %>%
+  ungroup(
+  ) %>%
+  dplyr::select(
+    date,
+    prcp,
+    snow,
+    snwd,
+    snow,
+    tavg,
+    tmax,
+    tmin
+  ) 
