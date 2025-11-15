@@ -406,9 +406,9 @@ graf10 <- tblG5 %>%
 #  1. zemljevid: Poglejmo kje se nahajajo postaje
 
 zemljevid1 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
-  get_stamenmap(
+  get_stadiamap(
     zoom = 11,
-    maptype = 'toner-lite'
+    maptype = 'stamen_toner_lite'
   ) %>%
   ggmap(
     extent = 'device',
@@ -440,9 +440,9 @@ zemljevid1 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
 #  2. zemljevid: Gostota postaj je bolje razvidna
 
 zemljevid2 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
-  get_stamenmap(
+  get_stadiamap(
     zoom = 11,
-    maptype = 'toner-lite'
+    maptype = 'stamen_toner_lite'
   ) %>%
   ggmap(
     extent = 'device',
@@ -477,9 +477,9 @@ zemljevid2 <- c(left = -77.4, bottom = 38.75, right = -76.75, top = 39.15) %>%
 #  3. zemljevid: 15 najbolj prometnih postaj za izposojo kolesa
 
 zemljevid3 <- c(left = -77.07, bottom = 38.873, right = -76.975, top = 38.925) %>%
-  get_stamenmap(
+  get_stadiamap(
     zoom = 14,
-    maptype = 'toner-lite'
+    maptype = 'stamen_toner_lite'
   ) %>%
   ggmap(
     extent = 'device',
@@ -510,9 +510,9 @@ zemljevid3 <- c(left = -77.07, bottom = 38.873, right = -76.975, top = 38.925) %
 #  4. zemljevid: 15 najbolj prometnih postaj za vrnitev kolesa
 
 zemljevid4 <- c(left = -77.07, bottom = 38.873, right = -76.975, top = 38.925) %>%
-  get_stamenmap(
+  get_stadiamap(
     zoom = 14,
-    maptype = 'toner-lite'
+    maptype = 'stamen_toner_lite'
   ) %>%
   ggmap(
     extent = 'device',
